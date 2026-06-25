@@ -15,6 +15,7 @@ Dokumen ini adalah rekaman lengkap mengenai seluruh fitur, penyelarasan algoritm
 *   **Bahasa Respon**: Seluruh penjelasan dan komunikasi dengan pengguna wajib menggunakan **Bahasa Indonesia**.
 *   **Perbandingan Kode**: Setiap kali melakukan perubahan berkas, tampilkan kode lama (*Before*) dan kode baru (*After*) secara terperinci.
 *   **Batas Payload File**: Maksimal **50MB** untuk semua berkas media.
+*   **Sinkronisasi Git Otomatis**: Setiap kali agen menyelesaikan perubahan berkas atau memperbaiki bug, agen wajib menjalankan `git add .`, `git commit -m "[Deskripsi Perubahan]"` dan `git push` untuk menyelaraskan perubahan ke repositori Git jarak jauh (*remote*) secara langsung.
 *   **Metode Upload**: Harus menggunakan **Three-Phase Async Process (Chunking)**:
     1.  *Phase 1*: Pemecahan berkas menjadi potongan 70KB (aman untuk `CacheService` GAS) di sisi client.
     2.  *Phase 2*: Pengunggahan berurutan dan perakitan di Google Apps Script menggunakan Array byte standar (bukan `Uint8Array` atau `.buffer`).

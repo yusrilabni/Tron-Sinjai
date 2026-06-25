@@ -30,6 +30,9 @@ To bypass Google Apps Script's 50MB payload limit (for single posts) and 30-seco
 2.  **Surgical Fixes**: Every change must be applied precisely to fix identified issues without introducing regressions or corrupting file structures (e.g., duplicated script tags).
 3.  **Proactive Validation**: Before declaring a task complete, the agent must ensure that all logic (including error handling and edge cases) is sound and follows the established architectural patterns.
 4.  **Automatic Continuity**: The agent must maintain state across turns, ensuring that fixes in one file (e.g., backend) are reflected in the corresponding frontend logic.
+5.  **Automatic Git Synchronization**: Whenever the agent modifies or creates any codebase files, the agent **MUST** automatically run `git add .`, `git commit -m "[Deskripsi Perubahan]"` and `git push` to synchronize changes with the remote Git repository immediately without manual user intervention.
+
+
 
 ## Technical Constraints
 

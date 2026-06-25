@@ -125,8 +125,15 @@ function doGet(e) {
 function validateAdminToken(token) {
   if (!token) return null;
   try {
-    const username = CacheService.getScriptCache().get("session_" + token);
-    return username || null;
+    const prop = PropertiesService.getScriptProperties().getProperty("session_" + token);
+    if (!prop) return null;
+    const session = JSON.parse(prop);
+    const now = new Date().getTime();
+    if (now > session.expires) {
+      PropertiesService.getScriptProperties().deleteProperty("session_" + token);
+      return null;
+    }
+    return session.username;
   } catch (e) {
     return null;
   }
@@ -576,8 +583,32 @@ function handleLogin(payload) {
   for (let i = 1; i < data.length; i++) {
     if (data[i][0] === payload.username && data[i][1] === payload.password) {
       writeLog(data[i][0], "LOGIN", "Admin masuk ke sistem");
+      
+      // Bersihkan sesi yang kadaluarsa untuk mencegah penumpukan
+      try {
+        const props = PropertiesService.getScriptProperties();
+        const allProps = props.getProperties();
+        const now = new Date().getTime();
+        for (let key in allProps) {
+          if (key.indexOf("session_") === 0) {
+            try {
+              const session = JSON.parse(allProps[key]);
+              if (now > session.expires) {
+                props.deleteProperty(key);
+              }
+            } catch (err) {
+              props.deleteProperty(key);
+            }
+          }
+        }
+      } catch (e) {}
+
       const token = "tok_" + Utilities.getUuid().replace(/-/g, "");
-      CacheService.getScriptCache().put("session_" + token, data[i][0], 21600); // Valid for 6 hours
+      const sessionData = {
+        username: data[i][0],
+        expires: new Date().getTime() + (6 * 60 * 60 * 1000) // Valid 6 Jam
+      };
+      PropertiesService.getScriptProperties().setProperty("session_" + token, JSON.stringify(sessionData));
       return response({ success: true, user: { username: data[i][0], role: data[i][2] }, token: token });
     }
   }
