@@ -677,7 +677,9 @@ const resetView = () => window.location.href = '/'
 
 onMounted(() => {
   isAdmin.value = !!localStorage.getItem('admin_user')
-  fetchInitialData()
+  if (isAdmin.value) {
+    fetchInitialData()
+  }
   
   // Cek query parameter "special" atau "type"
   const urlParams = new URLSearchParams(window.location.search)
