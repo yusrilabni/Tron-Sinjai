@@ -457,6 +457,87 @@
         </div>
       </transition>
 
+      <!-- TECHNICAL GUIDELINES MODAL -->
+      <transition name="page">
+        <div v-if="showGuidelineModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[250] flex items-center justify-center p-6">
+          <div class="bg-white max-w-lg w-full rounded-3xl p-8 md:p-10 text-left space-y-6 relative overflow-hidden shadow-2xl border border-slate-100 max-h-[90vh] flex flex-col justify-between">
+            <div class="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-amber-500 to-orange-500"></div>
+            
+            <!-- Header -->
+            <div class="space-y-1">
+              <h3 class="text-2xl font-black text-slate-900 uppercase tracking-tighter">Pedoman Teknis Materi</h3>
+              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Harap perhatikan ketentuan ukuran dan format file</p>
+            </div>
+
+            <!-- Content Area (Scrollable if needed) -->
+            <div class="space-y-5 overflow-y-auto pr-1 flex-1 text-xs text-slate-600 font-bold leading-relaxed">
+              
+              <!-- Peringatan Utama -->
+              <div class="p-4 bg-amber-50 rounded-2xl border border-amber-100 flex items-start gap-2.5">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                <span class="text-[9px] font-black text-amber-700 uppercase tracking-tight leading-relaxed">
+                  Penting: Admin tidak melayani pengeditan materi dalam bentuk apa pun. Konten yang dikirimkan harus berupa konten siap saji yang sudah jadi.
+                </span>
+              </div>
+
+              <!-- Ketentuan Gambar -->
+              <div class="p-5 bg-slate-50 rounded-2xl border border-slate-100 space-y-2">
+                <h5 class="text-[10px] font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">🖼️ FORMAT GAMBAR (.JPG / .PNG)</h5>
+                <ul class="list-disc pl-4 space-y-1 text-slate-500 font-medium">
+                  <li>Ukuran file: Maksimal <span class="font-black text-slate-700">5MB</span> (Maksimal mutlak 10MB).</li>
+                  <li>Rasio dimensi wajib: <span class="font-black text-slate-700">6 X 4 (Landscape)</span>.</li>
+                  <li>Resolusi tidak harus sangat tinggi, yang terpenting konten terbaca dengan jelas dan proporsional.</li>
+                </ul>
+              </div>
+
+              <!-- Ketentuan Video -->
+              <div class="p-5 bg-slate-50 rounded-2xl border border-slate-100 space-y-3">
+                <h5 class="text-[10px] font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">🎥 FORMAT VIDEO (.MP4 / DLL.)</h5>
+                
+                <!-- Video Standard -->
+                <div class="space-y-1 border-b border-slate-200/50 pb-2">
+                  <span class="text-[8px] font-black text-amber-600 uppercase tracking-widest">A. Formulir Publik (Standard)</span>
+                  <ul class="list-disc pl-4 space-y-1 text-slate-500 font-medium">
+                    <li>Durasi video: <span class="font-black text-slate-700">Kurang dari 30 Detik</span> (Direkomendasikan: 15-30 detik).</li>
+                    <li>Ukuran file: Maksimal <span class="font-black text-slate-700">30MB</span>.</li>
+                  </ul>
+                </div>
+
+                <!-- Video Khusus -->
+                <div class="space-y-1 pt-1">
+                  <span class="text-[8px] font-black text-blue-600 uppercase tracking-widest">B. Formulir Khusus (Internal Prioritas)</span>
+                  <ul class="list-disc pl-4 space-y-1 text-slate-500 font-medium">
+                    <li>Durasi video: Maksimal <span class="font-black text-slate-700">1 Menit (60 Detik)</span>.</li>
+                    <li>Ukuran file: Maksimal <span class="font-black text-slate-700">50MB</span>.</li>
+                  </ul>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Agreement Box -->
+            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+              <label class="flex items-start gap-3 cursor-pointer">
+                <input v-model="guidelineAgreed" type="checkbox" class="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 shrink-0 mt-0.5 cursor-pointer" />
+                <span class="text-[10px] font-black text-slate-700 uppercase tracking-tight leading-relaxed">
+                  Saya menyatakan bahwa saya telah membaca, memahami, dan menyetujui seluruh ketentuan format materi di atas.
+                </span>
+              </label>
+            </div>
+
+            <!-- Action Button -->
+            <button 
+              @click="showGuidelineModal = false"
+              :disabled="!guidelineAgreed"
+              :class="guidelineAgreed ? 'bg-slate-900 hover:bg-slate-800 shadow-lg cursor-pointer' : 'bg-slate-200 text-slate-400 cursor-not-allowed'"
+              class="w-full py-5 text-white rounded-xl font-black text-xs uppercase tracking-widest transition-all"
+            >
+              Saya Mengerti & Lanjutkan
+            </button>
+          </div>
+        </div>
+      </transition>
+
     </div>
   </div>
 </template>
@@ -468,6 +549,16 @@ import { getSettings, post } from '../api'
 const viewMode = ref<'CHOOSE_CATEGORY' | 'CHOOSE_INTERNAL_TYPE' | 'FORM_STANDARD' | 'FORM_SPECIAL'>('CHOOSE_CATEGORY')
 const showCommercialModal = ref(false)
 const isAdmin = ref(false)
+
+const showGuidelineModal = ref(false)
+const guidelineAgreed = ref(false)
+
+watch(viewMode, (newMode) => {
+  if (newMode === 'FORM_STANDARD' || newMode === 'FORM_SPECIAL') {
+    showGuidelineModal.value = true
+    guidelineAgreed.value = false
+  }
+})
 
 const isSubmitting = ref(false)
 const uploadProgress = ref(0)
@@ -559,11 +650,41 @@ const fetchInitialData = async () => {
 const handleFileUpload = (e: any) => {
   const file = e.target.files[0]
   if (!file) return
-  if (file.size > 100 * 1024 * 1024) {
-    alert('File terlalu besar! Maksimal 100MB.')
+  
+  const isVideo = file.type.startsWith('video/')
+  const isImage = file.type.startsWith('image/')
+  
+  let maxSizeBytes = 100 * 1024 * 1024 // 100MB fallback
+  let errorMsg = ''
+  
+  if (viewMode.value === 'FORM_SPECIAL') {
+    if (isImage) {
+      maxSizeBytes = 10 * 1024 * 1024 // 10MB
+      errorMsg = 'Untuk formulir khusus, ukuran file gambar maksimal 10MB (Rasio 6x4).'
+    } else if (isVideo) {
+      maxSizeBytes = 50 * 1024 * 1024 // 50MB
+      errorMsg = 'Untuk formulir khusus, ukuran file video maksimal 50MB (Durasi maksimal 1 menit).'
+    }
+  } else {
+    // FORM_STANDARD
+    if (isImage) {
+      maxSizeBytes = 10 * 1024 * 1024 // 10MB max limit
+      errorMsg = 'Ukuran file gambar maksimal 10MB (Rekomendasi di bawah 5MB, Rasio 6x4).'
+    } else if (isVideo) {
+      maxSizeBytes = 30 * 1024 * 1024 // 30MB
+      errorMsg = 'Ukuran file video maksimal 30MB (Durasi maksimal 30 detik).'
+    }
+  }
+
+  if (file.size > maxSizeBytes) {
+    alert(`⚠️ Berkas Terlalu Besar!\n${errorMsg}\n\nUkuran berkas Anda: ${(file.size / (1024 * 1024)).toFixed(2)} MB`);
     e.target.value = ''
+    form.fileObject = null
+    form.fileName = ''
+    form.mimeType = ''
     return
   }
+
   form.fileObject = file
   form.fileName = file.name
   form.mimeType = file.type
@@ -685,6 +806,8 @@ onMounted(() => {
   const urlParams = new URLSearchParams(window.location.search)
   if (urlParams.get('special') === '1' || urlParams.get('type') === 'internal-special') {
     viewMode.value = 'FORM_SPECIAL'
+    showGuidelineModal.value = true
+    guidelineAgreed.value = false
   }
 })
 </script>
