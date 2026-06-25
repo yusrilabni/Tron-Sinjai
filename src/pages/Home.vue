@@ -31,16 +31,12 @@
             <div class="aspect-[3/2] bg-black overflow-hidden rounded-sm relative">
               <!-- DYNAMIC MOCKUP: IMAGE OR VIDEO -->
               <template v-if="mockupContent.isVideo">
-                <video 
+                <iframe 
                   :key="mockupContent.url"
-                  :src="mockupContent.url" 
-                  autoplay 
-                  muted 
-                  @ended="onVideoEnded"
-                  @error="onVideoMockupError"
-                  playsinline
-                  class="w-full h-full object-cover transition-all duration-1000"
-                ></video>
+                  :src="getIframeUrl(mockupContent.url)" 
+                  class="w-full h-full border-none transition-all duration-1000"
+                  allow="autoplay; encrypted-media"
+                ></iframe>
               </template>
               <img 
                 v-else
@@ -50,7 +46,7 @@
                 :class="mockupContent.isDefault ? 'opacity-40 grayscale' : 'opacity-100'"
                 alt="Sinjai Digital" 
               />
-              <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+              <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent pointer-events-none"></div>
               <div class="absolute bottom-4 left-4 right-4 flex items-end justify-between">
                  <div class="text-white">
                    <div class="text-[8px] font-black uppercase opacity-60">Now Airing</div>
@@ -136,10 +132,11 @@
 
                     <!-- Media Logic -->
                     <template v-if="item.tipe === 'VIDEO'">
+                      <!-- Video Player -->
                       <video 
                         :key="item.url"
                         :src="getStreamUrl(item.url)" 
-                        class="relative z-10 w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-all duration-700"
+                        class="relative z-20 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-all duration-700"
                         muted 
                         loop 
                         autoplay
@@ -148,6 +145,13 @@
                         @loadeddata="onVideoLoad"
                         @error="handleVideoError"
                       ></video>
+                      <!-- Video Thumbnail Fallback -->
+                      <img 
+                        :src="getPreviewUrl(item.url)" 
+                        class="absolute inset-0 z-10 w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700"
+                        @load="onImageLoad"
+                        @error="handleImageError"
+                      />
                     </template>
                     <img 
                       v-else
@@ -269,10 +273,11 @@
 
                       <!-- Media Logic -->
                       <template v-if="child.tipe === 'VIDEO'">
+                        <!-- Video Player -->
                         <video 
                           :key="child.url"
                           :src="getStreamUrl(child.url)" 
-                          class="relative z-10 w-full h-full object-cover opacity-60 group-hover/card:opacity-100 transition-all duration-700"
+                          class="relative z-20 w-full h-full object-cover opacity-0 group-hover/card:opacity-100 transition-all duration-700"
                           muted 
                           loop 
                           autoplay
@@ -281,6 +286,13 @@
                           @loadeddata="onVideoLoad"
                           @error="handleVideoError"
                         ></video>
+                        <!-- Video Thumbnail Fallback -->
+                        <img 
+                          :src="getPreviewUrl(child.url)" 
+                          class="absolute inset-0 z-10 w-full h-full object-cover grayscale opacity-60 group-hover/card:grayscale-0 group-hover/card:opacity-100 transition-all duration-700"
+                          @load="onImageLoad"
+                          @error="handleImageError"
+                        />
                       </template>
                       <img 
                         v-else
@@ -538,11 +550,6 @@ const startSlideshow = () => {
   setupNextSlideshowTimer()
 }
 
-const onVideoEnded = () => {
-  console.log('[Mockup] Video ended, advancing to next slide')
-  advanceSlideshow()
-}
-
 const infoCards = [
   { title: 'Verifikasi Tepat', desc: 'Proses validasi konten yang terukur dan profesional oleh tim ahli kami.' },
   { title: 'Pantau Publikasi', desc: 'Sistem pelacakan real-time untuk menjamin kepastian penayangan materi Anda.' },
@@ -564,6 +571,17 @@ const getStreamUrl = (url: string) => {
     if (url.includes('id=')) id = url.split('id=')[1].split('&')[0]
     else if (url.includes('/d/')) id = url.split('/d/')[1].split('/')[0]
     return `https://drive.google.com/uc?id=${id}&export=download`
+  }
+  return url
+}
+
+const getIframeUrl = (url: string) => {
+  if (!url) return ''
+  if (url.includes('drive.google.com')) {
+    let id = ''
+    if (url.includes('id=')) id = url.split('id=')[1].split('&')[0]
+    else if (url.includes('/d/')) id = url.split('/d/')[1].split('/')[0]
+    if (id) return `https://drive.google.com/file/d/${id}/preview?autoplay=1`
   }
   return url
 }
@@ -597,11 +615,6 @@ const handleImageError = (e: any) => {
 
 const onImageLoad = (e: any) => {
   if (e.target.previousElementSibling) e.target.previousElementSibling.style.display = 'none'
-}
-
-const onVideoMockupError = () => {
-  console.warn('[Mockup] Video failed to load, skipping to next slide immediately')
-  advanceSlideshow()
 }
 
 const onVideoLoad = (e: any) => {
