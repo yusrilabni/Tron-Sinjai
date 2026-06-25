@@ -234,6 +234,9 @@
                 <div class="space-y-2">
                   <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Mulai Ditayangkan Pada</label>
                   <input v-model="form.tanggal_mulai" type="date" :min="todayDate" autocomplete="off" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-2 border-slate-50 focus:border-blue-700 focus:bg-white outline-none transition-all font-black text-slate-900" required />
+                  <p class="text-[10px] font-bold text-red-500 uppercase tracking-normal leading-snug mt-1.5">
+                    * Wajib diajukan minimal H-7 (7 hari sebelum) target tanggal penayangan.
+                  </p>
                 </div>
 
                 <!-- JIKA CARA DURASI = TANGGAL AKHIR (FORM KHUSUS ONLY) -->
@@ -248,6 +251,9 @@
                     </span>
                   </div>
                   <input v-model="tanggalAkhir" type="date" :min="form.tanggal_mulai || todayDate" :max="maxTanggalAkhir" :disabled="!form.tanggal_mulai" autocomplete="off" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-2 border-slate-50 focus:border-blue-700 focus:bg-white outline-none transition-all font-black text-slate-900 disabled:opacity-50 disabled:cursor-not-allowed" required />
+                  <p class="text-[9px] font-bold text-slate-400 uppercase tracking-normal leading-snug mt-1.5">
+                    * Pilihan tanggal akhir otomatis dibatasi maksimal 30 hari dari tanggal mulai.
+                  </p>
                 </div>
 
                 <!-- DURASI BIASA -->
@@ -484,13 +490,24 @@
                   </span>
                 </div>
 
+                <!-- Ketentuan Waktu Pengajuan (H-7) -->
+                <div class="p-5 bg-amber-50 rounded-2xl border border-amber-100 space-y-2">
+                  <h5 class="text-[10px] font-black text-amber-800 uppercase tracking-widest flex items-center gap-2">📅 WAKTU PENGAJUAN WAJIB (H-7)</h5>
+                  <p class="text-slate-700 font-semibold leading-relaxed">
+                    Pengajuan konten wajib dikirimkan minimal <span class="font-black text-amber-700">H-7 (7 hari sebelum)</span> rencana tanggal materi Anda akan mulai ditayangkan.
+                  </p>
+                  <p class="text-[10px] font-bold text-amber-600 leading-normal">
+                    * Catatan: Aturan ini berlaku untuk memberikan waktu bagi Admin dalam memverifikasi materi secara teknis serta menjadwalkan antrean videotron.
+                  </p>
+                </div>
+
                 <!-- Ketentuan Gambar -->
                 <div class="p-5 bg-slate-50 rounded-2xl border border-slate-100 space-y-2">
                   <h5 class="text-[10px] font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">🖼️ FORMAT GAMBAR (.JPG / .PNG)</h5>
                   <ul class="list-disc pl-4 space-y-1 text-slate-500 font-medium">
                     <li>Ukuran file: Maksimal <span class="font-black text-slate-700">5MB</span> (Maksimal mutlak 10MB).</li>
                     <li>Rasio dimensi wajib: <span class="font-black text-slate-700">6 X 4 (Landscape)</span>.</li>
-                    <li>Resolusi tidak harus sangat tinggi, yang terpenting konten terbaca dengan jelas dan proporsional.</li>
+                    <li>Resolusi tidak harus sangat tinggi, yang terpenting konten terbaca dengan jelas and proporsional.</li>
                   </ul>
                 </div>
 
