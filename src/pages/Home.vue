@@ -335,52 +335,54 @@
     </section>
 
     <!-- Lightbox Album Modal -->
-    <transition name="page">
-      <div v-if="activeAlbum" class="fixed inset-0 z-[500] flex flex-col items-center justify-center p-6 bg-slate-950/95 backdrop-blur-md">
-        <!-- Close Button -->
-        <button @click="activeAlbum = null" class="absolute top-6 right-6 text-white/70 hover:text-white p-3 bg-white/10 hover:bg-white/20 rounded-full transition-all">
-           <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
-        </button>
-
-        <div class="w-full max-w-5xl space-y-6 flex flex-col items-center">
-           <!-- Header / Title -->
-           <div class="text-center space-y-1">
-              <span class="text-[9px] font-black text-blue-400 uppercase tracking-[0.3em]">Album Galeri</span>
-              <h3 class="text-xl font-black text-white uppercase tracking-tight">{{ activeAlbumTitle }}</h3>
-           </div>
-
-           <!-- Main Preview Content -->
-           <div class="relative w-full aspect-[3/2] md:aspect-[16/9] bg-black/50 border border-white/10 rounded-2xl overflow-hidden flex items-center justify-center shadow-2xl">
-              <img :src="getPreviewUrl(activeAlbum[activeAlbumIndex])" class="max-w-full max-h-full object-contain" />
-              
-              <!-- Left/Right Nav Arrows -->
-              <button 
-                v-if="activeAlbum.length > 1" 
-                @click="activeAlbumIndex = (activeAlbumIndex - 1 + activeAlbum.length) % activeAlbum.length" 
-                class="absolute left-6 w-12 h-12 flex items-center justify-center bg-white/10 hover:bg-white/20 text-white rounded-full transition-all active:scale-90"
-              >
-                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" /></svg>
-              </button>
-              
-              <button 
-                v-if="activeAlbum.length > 1" 
-                @click="activeAlbumIndex = (activeAlbumIndex + 1) % activeAlbum.length" 
-                class="absolute right-6 w-12 h-12 flex items-center justify-center bg-white/10 hover:bg-white/20 text-white rounded-full transition-all active:scale-90"
-              >
-                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" /></svg>
-              </button>
-           </div>
-
-           <!-- Footer / Pagination Indicator -->
-           <div class="flex items-center gap-4 text-white">
-              <span class="text-xs font-black uppercase tracking-widest text-white/50">Foto {{ activeAlbumIndex + 1 }} dari {{ activeAlbum.length }}</span>
-              <a :href="activeAlbum[activeAlbumIndex]" target="_blank" class="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/10 rounded text-[9px] font-black uppercase tracking-widest transition-all">
-                 Buka File Asli
-              </a>
-           </div>
+    <teleport to="body">
+      <transition name="page">
+        <div v-if="activeAlbum" class="fixed inset-0 z-[9999] flex flex-col items-center justify-center p-6 bg-slate-950/95 backdrop-blur-md">
+          <!-- Close Button -->
+          <button @click="activeAlbum = null" class="absolute top-6 right-6 text-white/70 hover:text-white p-3 bg-white/10 hover:bg-white/20 rounded-full transition-all">
+             <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+  
+          <div class="w-full max-w-5xl space-y-6 flex flex-col items-center">
+             <!-- Header / Title -->
+             <div class="text-center space-y-1">
+                <span class="text-[9px] font-black text-blue-400 uppercase tracking-[0.3em]">Album Galeri</span>
+                <h3 class="text-xl font-black text-white uppercase tracking-tight">{{ activeAlbumTitle }}</h3>
+             </div>
+  
+             <!-- Main Preview Content -->
+             <div class="relative w-full aspect-[3/2] md:aspect-[16/9] bg-black/50 border border-white/10 rounded-2xl overflow-hidden flex items-center justify-center shadow-2xl">
+                <img :src="getPreviewUrl(activeAlbum[activeAlbumIndex])" class="max-w-full max-h-full object-contain" />
+                
+                <!-- Left/Right Nav Arrows -->
+                <button 
+                  v-if="activeAlbum.length > 1" 
+                  @click="activeAlbumIndex = (activeAlbumIndex - 1 + activeAlbum.length) % activeAlbum.length" 
+                  class="absolute left-6 w-12 h-12 flex items-center justify-center bg-white/10 hover:bg-white/20 text-white rounded-full transition-all active:scale-90"
+                >
+                   <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7" /></svg>
+                </button>
+                
+                <button 
+                  v-if="activeAlbum.length > 1" 
+                  @click="activeAlbumIndex = (activeAlbumIndex + 1) % activeAlbum.length" 
+                  class="absolute right-6 w-12 h-12 flex items-center justify-center bg-white/10 hover:bg-white/20 text-white rounded-full transition-all active:scale-90"
+                >
+                   <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" /></svg>
+                </button>
+             </div>
+  
+             <!-- Footer / Pagination Indicator -->
+             <div class="flex items-center gap-4 text-white">
+                <span class="text-xs font-black uppercase tracking-widest text-white/50">Foto {{ activeAlbumIndex + 1 }} dari {{ activeAlbum.length }}</span>
+                <a :href="activeAlbum[activeAlbumIndex]" target="_blank" class="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/10 rounded text-[9px] font-black uppercase tracking-widest transition-all">
+                   Buka File Asli
+                </a>
+             </div>
+          </div>
         </div>
-      </div>
-    </transition>
+      </transition>
+    </teleport>
 
     <!-- Stats/Info -->
     <section class="max-w-7xl mx-auto px-6 py-32 grid md:grid-cols-3 gap-20 border-t-2 border-slate-100">

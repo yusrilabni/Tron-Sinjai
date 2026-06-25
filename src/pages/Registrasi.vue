@@ -376,167 +376,175 @@
       </div>
 
       <!-- COMMERCIAL UNDER DEVELOPMENT MODAL -->
-      <transition name="page">
-        <div v-if="showCommercialModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[200] flex items-center justify-center p-6">
-          <div class="bg-white max-w-md w-full rounded-3xl p-10 md:p-12 text-center space-y-8 relative overflow-hidden shadow-2xl border border-slate-100">
-            <div class="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-blue-600 to-indigo-600"></div>
-            
-            <div class="w-20 h-20 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto shadow-inner animate-bounce">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>
-            </div>
-            
-            <div class="space-y-3">
-              <h2 class="text-3xl font-black text-slate-900 uppercase tracking-tighter leading-none">Fitur Komersial</h2>
-              <div class="inline-block px-3 py-1 bg-blue-50 text-blue-700 text-[8px] font-black uppercase tracking-widest rounded border border-blue-100">
-                Dalam Pengembangan
+      <teleport to="body">
+        <transition name="page">
+          <div v-if="showCommercialModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[9999] flex items-center justify-center p-6">
+            <div class="bg-white max-w-md w-full rounded-3xl p-10 md:p-12 text-center space-y-8 relative overflow-hidden shadow-2xl border border-slate-100">
+              <div class="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-blue-600 to-indigo-600"></div>
+              
+              <div class="w-20 h-20 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto shadow-inner animate-bounce">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>
               </div>
-              <p class="text-xs font-bold text-slate-400 leading-relaxed max-w-sm mx-auto">
-                Pendaftaran untuk Usaha Komersial (Iklan/Promosi Swasta) saat ini sedang ditangguhkan karena sedang dilakukan penyesuaian dan sinkronisasi dengan aturan/regulasi daerah yang berlaku serta integrasi sistem pembayaran elektronik.
-              </p>
-            </div>
+              
+              <div class="space-y-3">
+                <h2 class="text-3xl font-black text-slate-900 uppercase tracking-tighter leading-none">Fitur Komersial</h2>
+                <div class="inline-block px-3 py-1 bg-blue-50 text-blue-700 text-[8px] font-black uppercase tracking-widest rounded border border-blue-100">
+                  Dalam Pengembangan
+                </div>
+                <p class="text-xs font-bold text-slate-400 leading-relaxed max-w-sm mx-auto">
+                  Pendaftaran untuk Usaha Komersial (Iklan/Promosi Swasta) saat ini sedang ditangguhkan karena sedang dilakukan penyesuaian dan sinkronisasi dengan aturan/regulasi daerah yang berlaku serta integrasi sistem pembayaran elektronik.
+                </p>
+              </div>
 
-            <div class="space-y-2 p-6 bg-slate-50 rounded-2xl border border-slate-100 text-left">
-              <div class="flex justify-between items-center text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2">
-                <span>Progress Sinkronisasi & Integrasi</span>
-                <span class="text-blue-700">85%</span>
+              <div class="space-y-2 p-6 bg-slate-50 rounded-2xl border border-slate-100 text-left">
+                <div class="flex justify-between items-center text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2">
+                  <span>Progress Sinkronisasi & Integrasi</span>
+                  <span class="text-blue-700">85%</span>
+                </div>
+                <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+                  <div class="bg-gradient-to-r from-blue-600 to-indigo-600 h-full w-[85%] rounded-full"></div>
+                </div>
               </div>
-              <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
-                <div class="bg-gradient-to-r from-blue-600 to-indigo-600 h-full w-[85%] rounded-full"></div>
-              </div>
-            </div>
 
-            <button 
-              @click="showCommercialModal = false" 
-              class="w-full py-5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-black text-xs uppercase tracking-widest shadow-lg transition-all"
-            >
-              Mengerti
-            </button>
+              <button 
+                @click="showCommercialModal = false" 
+                class="w-full py-5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-black text-xs uppercase tracking-widest shadow-lg transition-all"
+              >
+                Mengerti
+              </button>
+            </div>
           </div>
-        </div>
-      </transition>
+        </transition>
+      </teleport>
 
       <!-- REGISTRATION SUCCESS MODAL -->
-      <transition name="page">
-        <div v-if="successData" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-[200] flex items-center justify-center p-6">
-          <div class="bg-white max-w-xl w-full rounded-3xl p-10 md:p-16 text-center space-y-10 relative overflow-hidden shadow-2xl border border-slate-100">
-            <div class="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-green-500 to-emerald-500"></div>
-            <div class="w-20 h-20 bg-green-50 text-green-600 rounded-full flex items-center justify-center mx-auto shadow-inner"><svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg></div>
-            <h2 class="text-4xl font-black text-slate-900 uppercase tracking-tighter leading-none">Pengajuan <span class="text-green-600">Berhasil!</span></h2>
-            
-            <p class="text-xs font-bold text-slate-400 leading-relaxed max-w-sm mx-auto">
-              Berkas Anda telah dicatat di database sistem. Simpan nomor registrasi di bawah untuk memeriksa status kelayakan tayang secara berkala.
-            </p>
+      <teleport to="body">
+        <transition name="page">
+          <div v-if="successData" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-[9999] flex items-center justify-center p-6">
+            <div class="bg-white max-w-xl w-full rounded-3xl p-10 md:p-16 text-center space-y-10 relative overflow-hidden shadow-2xl border border-slate-100">
+              <div class="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-green-500 to-emerald-500"></div>
+              <div class="w-20 h-20 bg-green-50 text-green-600 rounded-full flex items-center justify-center mx-auto shadow-inner"><svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg></div>
+              <h2 class="text-4xl font-black text-slate-900 uppercase tracking-tighter leading-none">Pengajuan <span class="text-green-600">Berhasil!</span></h2>
+              
+              <p class="text-xs font-bold text-slate-400 leading-relaxed max-w-sm mx-auto">
+                Berkas Anda telah dicatat di database sistem. Simpan nomor registrasi di bawah untuk memeriksa status kelayakan tayang secara berkala.
+              </p>
 
-            <div class="bg-slate-50 p-8 rounded-2xl border-2 border-dashed border-slate-200 group relative">
-               <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2">Simpan Nomor Registrasi:</span>
-               <span class="text-3xl font-black text-slate-900 font-mono tracking-tighter">{{ successData.no_registrasi }}</span>
-               <button @click="copyCode(successData.no_registrasi)" class="absolute top-3 right-3 p-2 bg-white rounded-lg shadow hover:text-blue-700 transition-colors"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg></button>
+              <div class="bg-slate-50 p-8 rounded-2xl border-2 border-dashed border-slate-200 group relative">
+                 <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2">Simpan Nomor Registrasi:</span>
+                 <span class="text-3xl font-black text-slate-900 font-mono tracking-tighter">{{ successData.no_registrasi }}</span>
+                 <button @click="copyCode(successData.no_registrasi)" class="absolute top-3 right-3 p-2 bg-white rounded-lg shadow hover:text-blue-700 transition-colors"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg></button>
+              </div>
+              
+              <button @click="resetView" class="w-full py-5 bg-slate-900 hover:bg-slate-850 text-white rounded-xl font-black text-xs uppercase tracking-widest transition-all">Selesai & Kembali</button>
             </div>
-            
-            <button @click="resetView" class="w-full py-5 bg-slate-900 hover:bg-slate-850 text-white rounded-xl font-black text-xs uppercase tracking-widest transition-all">Selesai & Kembali</button>
           </div>
-        </div>
-      </transition>
+        </transition>
+      </teleport>
 
       <!-- WARNING PROCEDURE STATEMENT MODAL -->
-      <transition name="page">
-        <div v-if="showWarning" class="fixed inset-0 bg-slate-950/90 backdrop-blur-xl z-[300] flex items-center justify-center p-6">
-          <div class="bg-white max-w-xl w-full rounded-3xl p-10 md:p-16 space-y-10 border-t-8 border-amber-500 shadow-2xl">
-            <div class="text-center space-y-4">
-              <div class="w-20 h-20 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center mx-auto"><svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg></div>
-              <h2 class="text-3xl font-black text-slate-900 uppercase tracking-tighter leading-none">Pernyataan Prosedur</h2>
-              <p class="text-xs font-bold text-slate-500 leading-relaxed text-justify italic bg-slate-50 p-6 rounded-2xl border border-slate-100">
-                "Pengajuan dilakukan di luar jam kerja atau mendesak. Saya memahami Admin hanya aktif pada hari/jam kerja resmi. Keterlambatan akibat unggahan mendadak adalah tanggung jawab pengaju sepenuhnya."
-              </p>
-            </div>
-            <div class="space-y-4">
-              <button @click="proceedWithSubmit" class="w-full py-5 bg-slate-950 hover:bg-slate-850 text-white rounded-xl font-black text-xs uppercase tracking-[0.3em] transition-all">Setuju & Kirim</button>
-              <button @click="showWarning = false" class="w-full py-4 text-slate-400 font-black text-[10px] uppercase tracking-widest hover:text-slate-900 transition-colors">Batalkan</button>
+      <teleport to="body">
+        <transition name="page">
+          <div v-if="showWarning" class="fixed inset-0 bg-slate-950/90 backdrop-blur-xl z-[9999] flex items-center justify-center p-6">
+            <div class="bg-white max-w-xl w-full rounded-3xl p-10 md:p-16 space-y-10 border-t-8 border-amber-500 shadow-2xl">
+              <div class="text-center space-y-4">
+                <div class="w-20 h-20 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center mx-auto"><svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg></div>
+                <h2 class="text-3xl font-black text-slate-900 uppercase tracking-tighter leading-none">Pernyataan Prosedur</h2>
+                <p class="text-xs font-bold text-slate-500 leading-relaxed text-justify italic bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                  "Pengajuan dilakukan di luar jam kerja atau mendesak. Saya memahami Admin hanya aktif pada hari/jam kerja resmi. Keterlambatan akibat unggahan mendadak adalah tanggung jawab pengaju sepenuhnya."
+                </p>
+              </div>
+              <div class="space-y-4">
+                <button @click="proceedWithSubmit" class="w-full py-5 bg-slate-950 hover:bg-slate-850 text-white rounded-xl font-black text-xs uppercase tracking-[0.3em] transition-all">Setuju & Kirim</button>
+                <button @click="showWarning = false" class="w-full py-4 text-slate-400 font-black text-[10px] uppercase tracking-widest hover:text-slate-900 transition-colors">Batalkan</button>
+              </div>
             </div>
           </div>
-        </div>
-      </transition>
+        </transition>
+      </teleport>
 
       <!-- TECHNICAL GUIDELINES MODAL -->
-      <transition name="page">
-        <div v-if="showGuidelineModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[250] flex items-center justify-center p-6">
-          <div class="bg-white max-w-lg w-full rounded-3xl p-8 md:p-10 text-left space-y-6 relative overflow-hidden shadow-2xl border border-slate-100 max-h-[90vh] flex flex-col justify-between">
-            <div class="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-amber-500 to-orange-500"></div>
-            
-            <!-- Header -->
-            <div class="space-y-1">
-              <h3 class="text-2xl font-black text-slate-900 uppercase tracking-tighter">Pedoman Teknis Materi</h3>
-              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Harap perhatikan ketentuan ukuran dan format file</p>
-            </div>
-
-            <!-- Content Area (Scrollable if needed) -->
-            <div class="space-y-5 overflow-y-auto pr-1 flex-1 text-xs text-slate-600 font-bold leading-relaxed">
+      <teleport to="body">
+        <transition name="page">
+          <div v-if="showGuidelineModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[9999] flex items-center justify-center p-6">
+            <div class="bg-white max-w-lg w-full rounded-3xl p-8 md:p-10 text-left space-y-6 relative overflow-hidden shadow-2xl border border-slate-100 max-h-[90vh] flex flex-col justify-between">
+              <div class="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-amber-500 to-orange-500"></div>
               
-              <!-- Peringatan Utama -->
-              <div class="p-4 bg-amber-50 rounded-2xl border border-amber-100 flex items-start gap-2.5">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                <span class="text-[9px] font-black text-amber-700 uppercase tracking-tight leading-relaxed">
-                  Penting: Admin tidak melayani pengeditan materi dalam bentuk apa pun. Konten yang dikirimkan harus berupa konten siap saji yang sudah jadi.
-                </span>
+              <!-- Header -->
+              <div class="space-y-1">
+                <h3 class="text-2xl font-black text-slate-900 uppercase tracking-tighter">Pedoman Teknis Materi</h3>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Harap perhatikan ketentuan ukuran dan format file</p>
               </div>
 
-              <!-- Ketentuan Gambar -->
-              <div class="p-5 bg-slate-50 rounded-2xl border border-slate-100 space-y-2">
-                <h5 class="text-[10px] font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">🖼️ FORMAT GAMBAR (.JPG / .PNG)</h5>
-                <ul class="list-disc pl-4 space-y-1 text-slate-500 font-medium">
-                  <li>Ukuran file: Maksimal <span class="font-black text-slate-700">5MB</span> (Maksimal mutlak 10MB).</li>
-                  <li>Rasio dimensi wajib: <span class="font-black text-slate-700">6 X 4 (Landscape)</span>.</li>
-                  <li>Resolusi tidak harus sangat tinggi, yang terpenting konten terbaca dengan jelas dan proporsional.</li>
-                </ul>
-              </div>
-
-              <!-- Ketentuan Video -->
-              <div class="p-5 bg-slate-50 rounded-2xl border border-slate-100 space-y-3">
-                <h5 class="text-[10px] font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">🎥 FORMAT VIDEO (.MP4 / DLL.)</h5>
+              <!-- Content Area (Scrollable if needed) -->
+              <div class="space-y-5 overflow-y-auto pr-1 flex-1 text-xs text-slate-600 font-bold leading-relaxed">
                 
-                <!-- Video Standard -->
-                <div class="space-y-1 border-b border-slate-200/50 pb-2">
-                  <span class="text-[8px] font-black text-amber-600 uppercase tracking-widest">A. Formulir Publik (Standard)</span>
+                <!-- Peringatan Utama -->
+                <div class="p-4 bg-amber-50 rounded-2xl border border-amber-100 flex items-start gap-2.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                  <span class="text-[9px] font-black text-amber-700 uppercase tracking-tight leading-relaxed">
+                    Penting: Admin tidak melayani pengeditan materi dalam bentuk apa pun. Konten yang dikirimkan harus berupa konten siap saji yang sudah jadi.
+                  </span>
+                </div>
+
+                <!-- Ketentuan Gambar -->
+                <div class="p-5 bg-slate-50 rounded-2xl border border-slate-100 space-y-2">
+                  <h5 class="text-[10px] font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">🖼️ FORMAT GAMBAR (.JPG / .PNG)</h5>
                   <ul class="list-disc pl-4 space-y-1 text-slate-500 font-medium">
-                    <li>Durasi video: <span class="font-black text-slate-700">Kurang dari 30 Detik</span> (Direkomendasikan: 15-30 detik).</li>
-                    <li>Ukuran file: Maksimal <span class="font-black text-slate-700">30MB</span>.</li>
+                    <li>Ukuran file: Maksimal <span class="font-black text-slate-700">5MB</span> (Maksimal mutlak 10MB).</li>
+                    <li>Rasio dimensi wajib: <span class="font-black text-slate-700">6 X 4 (Landscape)</span>.</li>
+                    <li>Resolusi tidak harus sangat tinggi, yang terpenting konten terbaca dengan jelas dan proporsional.</li>
                   </ul>
                 </div>
 
-                <!-- Video Khusus -->
-                <div class="space-y-1 pt-1">
-                  <span class="text-[8px] font-black text-blue-600 uppercase tracking-widest">B. Formulir Khusus (Internal Prioritas)</span>
-                  <ul class="list-disc pl-4 space-y-1 text-slate-500 font-medium">
-                    <li>Durasi video: Maksimal <span class="font-black text-slate-700">1 Menit (60 Detik)</span>.</li>
-                    <li>Ukuran file: Maksimal <span class="font-black text-slate-700">50MB</span>.</li>
-                  </ul>
+                <!-- Ketentuan Video -->
+                <div class="p-5 bg-slate-50 rounded-2xl border border-slate-100 space-y-3">
+                  <h5 class="text-[10px] font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">🎥 FORMAT VIDEO (.MP4 / DLL.)</h5>
+                  
+                  <!-- Video Standard -->
+                  <div class="space-y-1 border-b border-slate-200/50 pb-2">
+                    <span class="text-[8px] font-black text-amber-600 uppercase tracking-widest">A. Formulir Publik (Standard)</span>
+                    <ul class="list-disc pl-4 space-y-1 text-slate-500 font-medium">
+                      <li>Durasi video: <span class="font-black text-slate-700">Kurang dari 30 Detik</span> (Direkomendasikan: 15-30 detik).</li>
+                      <li>Ukuran file: Maksimal <span class="font-black text-slate-700">30MB</span>.</li>
+                    </ul>
+                  </div>
+
+                  <!-- Video Khusus -->
+                  <div class="space-y-1 pt-1">
+                    <span class="text-[8px] font-black text-blue-600 uppercase tracking-widest">B. Formulir Khusus (Internal Prioritas)</span>
+                    <ul class="list-disc pl-4 space-y-1 text-slate-500 font-medium">
+                      <li>Durasi video: Maksimal <span class="font-black text-slate-700">1 Menit (60 Detik)</span>.</li>
+                      <li>Ukuran file: Maksimal <span class="font-black text-slate-700">50MB</span>.</li>
+                    </ul>
+                  </div>
                 </div>
+
               </div>
 
-            </div>
+              <!-- Agreement Box -->
+              <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                <label class="flex items-start gap-3 cursor-pointer">
+                  <input v-model="guidelineAgreed" type="checkbox" class="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 shrink-0 mt-0.5 cursor-pointer" />
+                  <span class="text-[10px] font-black text-slate-700 uppercase tracking-tight leading-relaxed">
+                    Saya menyatakan bahwa saya telah membaca, memahami, dan menyetujui seluruh ketentuan format materi di atas.
+                  </span>
+                </label>
+              </div>
 
-            <!-- Agreement Box -->
-            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-              <label class="flex items-start gap-3 cursor-pointer">
-                <input v-model="guidelineAgreed" type="checkbox" class="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 shrink-0 mt-0.5 cursor-pointer" />
-                <span class="text-[10px] font-black text-slate-700 uppercase tracking-tight leading-relaxed">
-                  Saya menyatakan bahwa saya telah membaca, memahami, dan menyetujui seluruh ketentuan format materi di atas.
-                </span>
-              </label>
+              <!-- Action Button -->
+              <button 
+                @click="showGuidelineModal = false"
+                :disabled="!guidelineAgreed"
+                :class="guidelineAgreed ? 'bg-slate-900 hover:bg-slate-800 shadow-lg cursor-pointer' : 'bg-slate-200 text-slate-400 cursor-not-allowed'"
+                class="w-full py-5 text-white rounded-xl font-black text-xs uppercase tracking-widest transition-all"
+              >
+                Saya Mengerti & Lanjutkan
+              </button>
             </div>
-
-            <!-- Action Button -->
-            <button 
-              @click="showGuidelineModal = false"
-              :disabled="!guidelineAgreed"
-              :class="guidelineAgreed ? 'bg-slate-900 hover:bg-slate-800 shadow-lg cursor-pointer' : 'bg-slate-200 text-slate-400 cursor-not-allowed'"
-              class="w-full py-5 text-white rounded-xl font-black text-xs uppercase tracking-widest transition-all"
-            >
-              Saya Mengerti & Lanjutkan
-            </button>
           </div>
-        </div>
-      </transition>
+        </transition>
+      </teleport>
 
     </div>
   </div>
