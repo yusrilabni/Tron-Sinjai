@@ -391,13 +391,13 @@
                 Dalam Pengembangan
               </div>
               <p class="text-xs font-bold text-slate-400 leading-relaxed max-w-sm mx-auto">
-                Pendaftaran untuk Usaha Komersial (IKlan/Promosi Swasta) saat ini sedang dalam tahap integrasi sistem pembayaran elektronik.
+                Pendaftaran untuk Usaha Komersial (Iklan/Promosi Swasta) saat ini sedang ditangguhkan karena sedang dilakukan penyesuaian dan sinkronisasi dengan aturan/regulasi daerah yang berlaku serta integrasi sistem pembayaran elektronik.
               </p>
             </div>
 
             <div class="space-y-2 p-6 bg-slate-50 rounded-2xl border border-slate-100 text-left">
               <div class="flex justify-between items-center text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2">
-                <span>Progress Integrasi</span>
+                <span>Progress Sinkronisasi & Integrasi</span>
                 <span class="text-blue-700">85%</span>
               </div>
               <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
