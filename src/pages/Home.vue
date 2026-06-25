@@ -35,8 +35,11 @@
                   ref="mockupVideoRef"
                   :key="mockupContent.url"
                   :src="mockupContent.url" 
-                  class="w-full h-full transition-all duration-1000 absolute inset-0 z-10"
-                  :class="mockupFitMode === 'cover' ? 'object-cover' : 'object-contain'"
+                  class="w-full h-full transition-all duration-700 absolute inset-0 z-10"
+                  :class="[
+                    mockupFitMode === 'cover' ? 'object-cover' : 'object-contain',
+                    mockupVideoLoaded ? 'opacity-100' : 'opacity-0'
+                  ]"
                   muted
                   :loop="activeGalleryItems.length <= 1"
                   autoplay
@@ -45,14 +48,21 @@
                   preload="auto"
                   @loadedmetadata="onMockupVideoLoad"
                   @canplay="onMockupVideoLoad"
+                  @playing="onMockupVideoPlaying"
                   @ended="advanceSlideshow"
+                  @error="onMockupVideoError"
                 ></video>
-                <!-- Thumbnail Fallback as background while video is loading/buffering -->
+                <!-- Thumbnail Fallback as background (fully visible when loading) -->
                 <img 
                   :src="getPreviewUrl(mockupContent.url)" 
-                  class="w-full h-full object-cover absolute inset-0 z-0 opacity-40 grayscale"
-                  alt="Loading Video..."
+                  class="w-full h-full absolute inset-0 z-0 transition-opacity duration-700"
+                  :class="mockupFitMode === 'cover' ? 'object-cover' : 'object-contain'"
+                  alt="Loading Media..."
                 />
+                <!-- Loader spinner visible only when video is not loaded yet -->
+                <div v-if="!mockupVideoLoaded" class="absolute inset-0 flex items-center justify-center bg-slate-950/20 backdrop-blur-[2px] z-20 pointer-events-none">
+                   <div class="w-8 h-8 border-4 border-white/20 border-t-white rounded-full animate-spin"></div>
+                </div>
               </template>
               <img 
                 v-else
@@ -506,6 +516,7 @@ const mockupMuted = ref(true)
 const mockupFitMode = ref<'cover' | 'contain'>('cover')
 const isSlideshowPaused = ref(false)
 const mockupVideoRef = ref<HTMLVideoElement | null>(null)
+const mockupVideoLoaded = ref(false)
 
 const toggleMockupMuted = () => {
   mockupMuted.value = !mockupMuted.value
@@ -537,14 +548,25 @@ const onMockupVideoLoad = (e: any) => {
     video.muted = mockupMuted.value
     // Double check if slideshow is not paused
     if (!isSlideshowPaused.value) {
-      video.play().catch((err: any) => {
+      video.play().then(() => {
+        mockupVideoLoaded.value = true
+      }).catch((err: any) => {
         console.warn("Programmatic play failed:", err)
       })
     }
   }
 }
 
+const onMockupVideoPlaying = () => {
+  mockupVideoLoaded.value = true
+}
+
+const onMockupVideoError = () => {
+  mockupVideoLoaded.value = false
+}
+
 watch(() => mockupContent.value.url, async () => {
+  mockupVideoLoaded.value = false
   if (mockupContent.value.isVideo) {
     await nextTick()
     if (mockupVideoRef.value) {
