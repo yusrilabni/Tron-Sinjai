@@ -128,6 +128,7 @@ function getSessionsSheet() {
   if (!sheet) {
     sheet = ss.insertSheet('Sessions_Admin');
     sheet.appendRow(['Token', 'Username', 'Expires']);
+    sheet.getRange("C:C").setNumberFormat("@"); // Force C column (Expires) to be Plain Text format
   }
   return sheet;
 }
@@ -140,7 +141,8 @@ function validateAdminToken(token) {
     const now = new Date().getTime();
     for (let i = 1; i < data.length; i++) {
       if (data[i][0] === token) {
-        const expires = parseInt(data[i][2]) || 0;
+        const expVal = data[i][2] ? data[i][2].toString().trim() : "";
+        const expires = Number(expVal) || 0;
         if (now <= expires) {
           return data[i][1]; // return username
         } else {
@@ -611,14 +613,15 @@ function handleLogin(payload) {
       try {
         const sessionData = sessionSheet.getDataRange().getValues();
         for (let j = sessionData.length - 1; j >= 1; j--) {
-          const exp = parseInt(sessionData[j][2]) || 0;
+          const expVal = sessionData[j][2] ? sessionData[j][2].toString().trim() : "";
+          const exp = Number(expVal) || 0;
           if (now > exp) {
             sessionSheet.deleteRow(j + 1);
           }
         }
       } catch (err) {}
       
-      sessionSheet.appendRow([token, data[i][0], expires]);
+      sessionSheet.appendRow([token, data[i][0], "'" + expires]);
       return response({ success: true, user: { username: data[i][0], role: data[i][2] }, token: token });
     }
   }
