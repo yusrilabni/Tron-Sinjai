@@ -184,20 +184,20 @@
               </div>
               <div class="grid md:grid-cols-2 gap-6 md:gap-8">
                 <div class="space-y-2">
-                  <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Instansi / Nama Lembaga</label>
-                  <input v-model="form.instansi" type="text" placeholder="Contoh: Dinas Kesehatan" autocomplete="off" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-2 border-slate-50 focus:border-blue-700 focus:bg-white outline-none transition-all font-bold" required />
+                  <label class="text-xs sm:text-sm font-black text-slate-700 uppercase tracking-wider ml-1">Instansi / Nama Lembaga</label>
+                  <input v-model="form.instansi" type="text" placeholder="Contoh: Dinas Kesehatan" autocomplete="off" class="w-full px-4 py-3 sm:px-5 sm:py-3.5 rounded-xl bg-white border-2 border-slate-200 focus:border-blue-700 focus:ring-4 focus:ring-blue-700/5 outline-none transition-all font-bold text-slate-900 text-sm sm:text-base placeholder:text-slate-400 placeholder:font-semibold" required />
                 </div>
                 <div class="space-y-2">
-                  <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Nama PIC (Penanggung Jawab)</label>
-                  <input v-model="form.pic" type="text" placeholder="Nama Lengkap" autocomplete="off" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-2 border-slate-50 focus:border-blue-700 focus:bg-white outline-none transition-all font-bold" required />
+                  <label class="text-xs sm:text-sm font-black text-slate-700 uppercase tracking-wider ml-1">Nama PIC (Penanggung Jawab)</label>
+                  <input v-model="form.pic" type="text" placeholder="Nama Lengkap" autocomplete="off" class="w-full px-4 py-3 sm:px-5 sm:py-3.5 rounded-xl bg-white border-2 border-slate-200 focus:border-blue-700 focus:ring-4 focus:ring-blue-700/5 outline-none transition-all font-bold text-slate-900 text-sm sm:text-base placeholder:text-slate-400 placeholder:font-semibold" required />
                 </div>
                 <div class="space-y-2">
-                  <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Nomor WhatsApp Aktif</label>
-                  <input v-model="form.hp" type="tel" placeholder="Contoh: 08123456789" autocomplete="off" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-2 border-slate-50 focus:border-blue-700 focus:bg-white outline-none transition-all font-bold" required />
+                  <label class="text-xs sm:text-sm font-black text-slate-700 uppercase tracking-wider ml-1">Nomor WhatsApp Aktif</label>
+                  <input v-model="form.hp" type="tel" placeholder="Contoh: 08123456789" autocomplete="off" class="w-full px-4 py-3 sm:px-5 sm:py-3.5 rounded-xl bg-white border-2 border-slate-200 focus:border-blue-700 focus:ring-4 focus:ring-blue-700/5 outline-none transition-all font-bold text-slate-900 text-sm sm:text-base placeholder:text-slate-400 placeholder:font-semibold" required />
                 </div>
                 <div class="space-y-2">
-                  <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Email Resmi Instansi</label>
-                  <input v-model="form.email" type="email" placeholder="Contoh: dinas@sinjaikab.go.id" autocomplete="off" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-2 border-slate-50 focus:border-blue-700 focus:bg-white outline-none transition-all font-bold" required />
+                  <label class="text-xs sm:text-sm font-black text-slate-700 uppercase tracking-wider ml-1">Email Resmi Instansi</label>
+                  <input v-model="form.email" type="email" placeholder="Contoh: dinas@sinjaikab.go.id" autocomplete="off" class="w-full px-4 py-3 sm:px-5 sm:py-3.5 rounded-xl bg-white border-2 border-slate-200 focus:border-blue-700 focus:ring-4 focus:ring-blue-700/5 outline-none transition-all font-bold text-slate-900 text-sm sm:text-base placeholder:text-slate-400 placeholder:font-semibold" required />
                 </div>
               </div>
             </div>
@@ -211,12 +211,12 @@
               </div>
               <div class="grid md:grid-cols-2 gap-6 md:gap-8">
                 <div class="space-y-2">
-                  <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Judul / Tema Publikasi</label>
-                  <input v-model="form.judul" type="text" name="v_judul_iklan" placeholder="Contoh: Himbauan Jaga Kebersihan" autocomplete="new-password" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-2 border-slate-50 focus:border-blue-700 focus:bg-white outline-none transition-all font-bold" required />
+                  <label class="text-xs sm:text-sm font-black text-slate-700 uppercase tracking-wider ml-1">Judul / Tema Publikasi</label>
+                  <input v-model="form.judul" type="text" name="v_judul_iklan" placeholder="Contoh: Himbauan Jaga Kebersihan" autocomplete="new-password" class="w-full px-4 py-3 sm:px-5 sm:py-3.5 rounded-xl bg-white border-2 border-slate-200 focus:border-blue-700 focus:ring-4 focus:ring-blue-700/5 outline-none transition-all font-bold text-slate-900 text-sm sm:text-base placeholder:text-slate-400 placeholder:font-semibold" required />
                 </div>
                 <div class="space-y-2">
-                  <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Kategori Publikasi</label>
-                  <select v-model="form.kategori" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-2 border-slate-50 focus:border-blue-700 focus:bg-white outline-none transition-all font-bold text-slate-900" required>
+                  <label class="text-xs sm:text-sm font-black text-slate-700 uppercase tracking-wider ml-1">Kategori Publikasi</label>
+                  <select v-model="form.kategori" class="w-full px-4 py-3 sm:px-5 sm:py-3.5 rounded-xl bg-white border-2 border-slate-200 focus:border-blue-700 focus:ring-4 focus:ring-blue-700/5 outline-none transition-all font-bold text-slate-900 text-sm sm:text-base cursor-pointer" required>
                     <option value="">Pilih Kategori...</option>
                     <option value="Pembangunan">Pembangunan Daerah</option>
                     <option value="Himbauan">Himbauan Masyarakat</option>
@@ -233,8 +233,8 @@
               
               <!-- Custom Category Text Input -->
               <div v-if="form.kategori === 'Lainnya'" class="space-y-2 animate-fade-in">
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Kategori Kustom Anda</label>
-                <input v-model="form.kategori_kustom" type="text" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-2 border-slate-50 focus:border-blue-700 focus:bg-white outline-none transition-all font-bold text-slate-900" placeholder="Ketik kategori kustom..." required />
+                <label class="text-xs sm:text-sm font-black text-slate-700 uppercase tracking-wider ml-1">Kategori Kustom Anda</label>
+                <input v-model="form.kategori_kustom" type="text" class="w-full px-4 py-3 sm:px-5 sm:py-3.5 rounded-xl bg-white border-2 border-slate-200 focus:border-blue-700 focus:ring-4 focus:ring-blue-700/5 outline-none transition-all font-bold text-slate-900 text-sm sm:text-base placeholder:text-slate-400 placeholder:font-semibold" placeholder="Ketik kategori kustom..." required />
               </div>
             </div>
 
@@ -247,46 +247,46 @@
               </div>
 
               <!-- Pilihan Metode Jadwal (Tab Premium) -->
-              <div class="space-y-4">
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 block">Metode Penentuan Jadwal Tayang</label>
-                <div class="flex flex-col sm:flex-row gap-3 p-1.5 bg-slate-100 rounded-2xl max-w-xl">
+              <div class="space-y-3">
+                <label class="text-xs sm:text-sm font-black text-slate-700 uppercase tracking-wider ml-1 block">Metode Penentuan Jadwal Tayang</label>
+                <div class="flex flex-col sm:flex-row gap-2 p-1.5 bg-slate-100 rounded-2xl max-w-xl">
                   <button 
                     type="button" 
                     @click="metodeJadwal = 'MANUAL'"
-                    :class="metodeJadwal === 'MANUAL' ? 'bg-white text-blue-700 shadow-md border-blue-100' : 'text-slate-500 hover:text-slate-900 border-transparent'"
-                    class="flex-1 py-3 text-[10px] font-black uppercase tracking-wider rounded-xl border-2 transition-all cursor-pointer text-center"
+                    :class="metodeJadwal === 'MANUAL' ? 'bg-white text-blue-700 shadow-sm border-blue-100' : 'text-slate-500 hover:text-slate-800 border-transparent'"
+                    class="flex-1 py-2.5 sm:py-3 text-[10px] sm:text-xs font-black uppercase tracking-wider rounded-xl border-2 transition-all cursor-pointer text-center"
                   >
                     🗓️ Atur Durasi Biasa
                   </button>
                   <button 
                     type="button" 
                     @click="metodeJadwal = 'ACARA'"
-                    :class="metodeJadwal === 'ACARA' ? 'bg-white text-blue-700 shadow-md border-blue-100' : 'text-slate-500 hover:text-slate-900 border-transparent'"
-                    class="flex-1 py-3 text-[10px] font-black uppercase tracking-wider rounded-xl border-2 transition-all cursor-pointer text-center"
+                    :class="metodeJadwal === 'ACARA' ? 'bg-white text-blue-700 shadow-sm border-blue-100' : 'text-slate-500 hover:text-slate-800 border-transparent'"
+                    class="flex-1 py-2.5 sm:py-3 text-[10px] sm:text-xs font-black uppercase tracking-wider rounded-xl border-2 transition-all cursor-pointer text-center"
                   >
-                    🏆 Berdasarkan Hari Puncak Acara
+                    🏆 Hari Puncak Acara
                   </button>
                 </div>
-                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-normal leading-relaxed ml-1">
+                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-normal leading-relaxed ml-1">
                   {{ metodeJadwal === 'MANUAL' ? '* Anda menentukan tanggal mulai tayang dan durasi hari tayang secara manual.' : '* Sistem akan otomatis menjadwalkan tayang mulai H-2 sebelum puncak acara hingga hari H acara selesai.' }}
                 </p>
               </div>
 
               <!-- PILIHAN CARA INPUT DURASI (HANYA MUNCUL DI METODE MANUAL & HANYA UNTUK FORM KHUSUS) -->
-              <div v-if="metodeJadwal === 'MANUAL' && viewMode === 'FORM_SPECIAL'" class="flex gap-3 p-1.5 bg-slate-100 rounded-2xl max-w-md">
+              <div v-if="metodeJadwal === 'MANUAL' && viewMode === 'FORM_SPECIAL'" class="flex gap-2 p-1.5 bg-slate-100 rounded-2xl max-w-md">
                 <button 
                   type="button" 
                   @click="caraDurasi = 'DURASI'"
-                  :class="caraDurasi === 'DURASI' ? 'bg-white text-blue-700 shadow-md border-blue-100' : 'text-slate-500 hover:text-slate-900 border-transparent'"
-                  class="flex-1 py-3.5 text-[9px] font-black uppercase tracking-wider rounded-xl border-2 transition-all cursor-pointer"
+                  :class="caraDurasi === 'DURASI' ? 'bg-white text-blue-700 shadow-sm border-blue-100' : 'text-slate-500 hover:text-slate-800 border-transparent'"
+                  class="flex-1 py-2.5 sm:py-3.5 text-[9px] sm:text-[11px] font-black uppercase tracking-wider rounded-xl border-2 transition-all cursor-pointer"
                 >
                   🗓️ Tentukan Durasi
                 </button>
                 <button 
                   type="button" 
                   @click="caraDurasi = 'TANGGAL_AKHIR'"
-                  :class="caraDurasi === 'TANGGAL_AKHIR' ? 'bg-white text-blue-700 shadow-md border-blue-100' : 'text-slate-500 hover:text-slate-900 border-transparent'"
-                  class="flex-1 py-3.5 text-[9px] font-black uppercase tracking-wider rounded-xl border-2 transition-all cursor-pointer"
+                  :class="caraDurasi === 'TANGGAL_AKHIR' ? 'bg-white text-blue-700 shadow-sm border-blue-100' : 'text-slate-500 hover:text-slate-800 border-transparent'"
+                  class="flex-1 py-2.5 sm:py-3.5 text-[9px] sm:text-[11px] font-black uppercase tracking-wider rounded-xl border-2 transition-all cursor-pointer"
                 >
                   🏁 Hingga Tanggal Akhir
                 </button>
@@ -295,11 +295,11 @@
               <!-- JIKA METODE JADWAL = MANUAL -->
               <div v-if="metodeJadwal === 'MANUAL'" class="grid md:grid-cols-2 gap-6 md:gap-8 animate-fade-in">
                  <div class="space-y-2">
-                   <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Mulai Ditayangkan Pada</label>
-                   <input v-model="form.tanggal_mulai" type="date" :min="todayDate" autocomplete="off" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-2 border-slate-50 focus:border-blue-700 focus:bg-white outline-none transition-all font-black text-slate-900" required />
+                   <label class="text-xs sm:text-sm font-black text-slate-700 uppercase tracking-wider ml-1">Mulai Ditayangkan Pada</label>
+                   <input v-model="form.tanggal_mulai" type="date" :min="todayDate" autocomplete="off" class="w-full px-4 py-3 sm:px-5 sm:py-3.5 rounded-xl bg-white border-2 border-slate-200 focus:border-blue-700 focus:ring-4 focus:ring-blue-700/5 outline-none transition-all font-black text-slate-900" required />
                   
                   <!-- Consequence warning for FORM_STANDARD -->
-                  <div v-if="viewMode === 'FORM_STANDARD' && form.tanggal_mulai" class="mt-2 p-3 rounded-xl border text-[9px] font-black uppercase tracking-wider leading-relaxed" :class="maxDurasiStandard >= 3 ? 'bg-blue-50/50 border-blue-100 text-blue-700' : 'bg-red-50 border-red-100 text-red-600 animate-pulse'">
+                  <div v-if="viewMode === 'FORM_STANDARD' && form.tanggal_mulai" class="mt-2 p-3.5 rounded-xl border-2 text-[10px] sm:text-xs font-black uppercase tracking-wider leading-relaxed" :class="maxDurasiStandard >= 3 ? 'bg-emerald-50 border-emerald-100 text-emerald-800' : 'bg-red-50 border-red-100 text-red-700 animate-pulse'">
                     <span v-if="maxDurasiStandard >= 3">
                       ✓ Pengajuan tepat waktu (>= 3 hari sebelum tayang). Durasi maksimal 3 hari diperbolehkan.
                     </span>
@@ -315,23 +315,23 @@
                 <!-- JIKA CARA DURASI = TANGGAL AKHIR (FORM KHUSUS ONLY) -->
                 <div v-if="viewMode === 'FORM_SPECIAL' && caraDurasi === 'TANGGAL_AKHIR'" class="space-y-2">
                   <div class="flex justify-between items-center">
-                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Selesai Ditayangkan Pada</label>
-                    <span v-if="form.tanggal_mulai && tanggalAkhir && form.durasi > 0" class="text-[8px] font-black text-blue-700 bg-blue-50 px-2.5 py-1 rounded uppercase tracking-wider border border-blue-100">
+                    <label class="text-xs sm:text-sm font-black text-slate-700 uppercase tracking-wider ml-1">Selesai Ditayangkan Pada</label>
+                    <span v-if="form.tanggal_mulai && tanggalAkhir && form.durasi > 0" class="text-[8px] sm:text-[10px] font-black text-blue-700 bg-blue-50 px-2.5 py-1 rounded uppercase tracking-wider border border-blue-100">
                       {{ form.durasi }} Hari Tayang
                     </span>
-                    <span v-if="!form.tanggal_mulai" class="text-[8px] font-black text-amber-600 bg-amber-50 px-2.5 py-1 rounded uppercase tracking-wider border border-amber-100 animate-pulse">
+                    <span v-if="!form.tanggal_mulai" class="text-[8px] sm:text-[10px] font-black text-amber-600 bg-amber-50 px-2.5 py-1 rounded uppercase tracking-wider border border-amber-100 animate-pulse">
                       ⚠️ Pilih tanggal mulai dahulu
                     </span>
                   </div>
-                  <input v-model="tanggalAkhir" type="date" :min="form.tanggal_mulai || todayDate" :max="maxTanggalAkhir" :disabled="!form.tanggal_mulai" autocomplete="off" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-2 border-slate-50 focus:border-blue-700 focus:bg-white outline-none transition-all font-black text-slate-900 disabled:opacity-50 disabled:cursor-not-allowed" required />
-                  <p class="text-[9px] font-bold text-slate-400 uppercase tracking-normal leading-snug mt-1.5">
+                  <input v-model="tanggalAkhir" type="date" :min="form.tanggal_mulai || todayDate" :max="maxTanggalAkhir" :disabled="!form.tanggal_mulai" autocomplete="off" class="w-full px-4 py-3 sm:px-5 sm:py-3.5 rounded-xl bg-white border-2 border-slate-200 focus:border-blue-700 focus:ring-4 focus:ring-blue-700/5 outline-none transition-all font-black text-slate-900 disabled:opacity-50 disabled:cursor-not-allowed" required />
+                  <p class="text-[10px] font-bold text-slate-500 uppercase tracking-normal leading-snug mt-1.5">
                     * Pilihan tanggal akhir otomatis dibatasi maksimal 30 hari dari tanggal mulai.
                   </p>
                 </div>
 
                 <!-- DURASI BIASA -->
                 <div v-else class="space-y-2">
-                  <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
+                  <label class="text-xs sm:text-sm font-black text-slate-700 uppercase tracking-wider ml-1">
                     {{ viewMode === 'FORM_STANDARD' ? 'Durasi Penayangan (Maks 3 Hari)' : 'Durasi Penayangan (Maks 30 Hari)' }}
                   </label>
                   <div class="flex gap-2">
@@ -341,14 +341,14 @@
                       min="1" 
                       :max="viewMode === 'FORM_STANDARD' ? 3 : 30" 
                       autocomplete="off" 
-                      class="flex-grow px-6 py-4 rounded-xl bg-slate-50 border-2 border-slate-50 focus:border-blue-700 focus:bg-white outline-none transition-all font-black text-slate-900" 
+                      class="flex-grow px-4 py-3 sm:px-5 sm:py-3.5 rounded-xl bg-white border-2 border-slate-200 focus:border-blue-700 focus:ring-4 focus:ring-blue-700/5 outline-none transition-all font-black text-slate-900 text-sm sm:text-base" 
                       required 
                     />
                     
                     <!-- Satuan terkunci "Hari" -->
                     <div 
                       :class="viewMode === 'FORM_SPECIAL' ? 'bg-blue-50 border-blue-100 text-blue-800' : 'bg-amber-50 border-amber-100 text-amber-800'"
-                      class="px-6 py-4 rounded-xl border-2 font-black text-[9px] uppercase tracking-widest flex items-center"
+                      class="px-5 py-3 sm:px-6 sm:py-3.5 rounded-xl border-2 font-black text-[10px] sm:text-xs uppercase tracking-widest flex items-center justify-center shrink-0"
                     >
                       Hari
                     </div>
@@ -359,8 +359,8 @@
               <!-- JIKA METODE JADWAL = ACARA -->
               <div v-else class="grid md:grid-cols-2 gap-6 md:gap-8 animate-fade-in">
                  <div class="space-y-2">
-                   <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Tanggal Puncak Acara / Event</label>
-                   <input v-model="tanggalAcara" type="date" :min="todayDate" autocomplete="off" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-2 border-slate-50 focus:border-blue-700 focus:bg-white outline-none transition-all font-black text-slate-900" required />
+                   <label class="text-xs sm:text-sm font-black text-slate-700 uppercase tracking-wider ml-1">Tanggal Puncak Acara / Event</label>
+                   <input v-model="tanggalAcara" type="date" :min="todayDate" autocomplete="off" class="w-full px-4 py-3 sm:px-5 sm:py-3.5 rounded-xl bg-white border-2 border-slate-200 focus:border-blue-700 focus:ring-4 focus:ring-blue-700/5 outline-none transition-all font-black text-slate-900" required />
                 </div>
                 
                 <div class="space-y-2 flex flex-col justify-end">
@@ -405,39 +405,39 @@
                  <div class="flex-grow h-px bg-slate-100"></div>
               </div>
               
-              <div class="space-y-8 max-w-xl">
-                <div class="space-y-4">
-                  <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Metode Pengiriman Berkas</label>
-                  <div class="grid grid-cols-2 gap-3 p-1 bg-slate-100 rounded-xl">
+              <div class="space-y-6 max-w-xl">
+                <div class="space-y-3">
+                  <label class="text-xs sm:text-sm font-black text-slate-700 uppercase tracking-wider ml-1">Metode Pengiriman Berkas</label>
+                  <div class="grid grid-cols-2 gap-2 p-1.5 bg-slate-100 rounded-xl">
                     <button 
                       type="button" 
                       @click="uploadType = 'FILE'" 
-                      :class="uploadType === 'FILE' ? 'bg-white text-slate-900 shadow' : 'text-slate-500 hover:text-slate-900'"
-                      class="py-2.5 rounded-lg font-black text-[10px] uppercase tracking-wider transition-all text-center cursor-pointer"
+                      :class="uploadType === 'FILE' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'"
+                      class="py-2 rounded-lg font-black text-[10px] sm:text-xs uppercase tracking-wider transition-all text-center cursor-pointer"
                     >
                       📁 Upload File
                     </button>
                     <button 
                       type="button" 
                       @click="uploadType = 'LINK'" 
-                      :class="uploadType === 'LINK' ? 'bg-white text-slate-900 shadow' : 'text-slate-500 hover:text-slate-900'"
-                      class="py-2.5 rounded-lg font-black text-[10px] uppercase tracking-wider transition-all text-center cursor-pointer"
+                      :class="uploadType === 'LINK' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'"
+                      class="py-2 rounded-lg font-black text-[10px] sm:text-xs uppercase tracking-wider transition-all text-center cursor-pointer"
                     >
                       🔗 Link Drive
                     </button>
                   </div>
 
                   <!-- Input Upload File -->
-                  <div v-if="uploadType === 'FILE'" class="space-y-2 animate-fade-in">
-                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 block">Pilih Berkas (Gambar/Video - Maks 100MB)</label>
-                    <input type="file" @change="handleFileUpload" accept="image/*,video/*" class="w-full text-[10px] font-black text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-slate-900 file:text-white hover:file:bg-blue-700 cursor-pointer" :required="uploadType === 'FILE'" />
+                  <div v-if="uploadType === 'FILE'" class="space-y-2 pt-2 animate-fade-in">
+                    <label class="text-xs sm:text-sm font-black text-slate-700 uppercase tracking-wider ml-1 block">Pilih Berkas (Gambar/Video - Maks 100MB)</label>
+                    <input type="file" @change="handleFileUpload" accept="image/*,video/*" class="w-full text-xs font-black text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-slate-900 file:text-white hover:file:bg-blue-700 cursor-pointer" :required="uploadType === 'FILE'" />
                   </div>
 
                   <!-- Input Tautan Google Drive -->
-                  <div v-else class="space-y-2 animate-fade-in">
-                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 block">Tautan Google Drive</label>
-                    <input v-model="linkUrl" type="url" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-2 border-slate-50 focus:border-blue-700 focus:bg-white outline-none transition-all font-bold text-slate-900 placeholder:text-slate-300" placeholder="https://drive.google.com/file/d/.../view" :required="uploadType === 'LINK'" />
-                    <p class="text-[8px] font-bold text-slate-400 uppercase leading-normal tracking-tight">
+                  <div v-else class="space-y-2 pt-2 animate-fade-in">
+                    <label class="text-xs sm:text-sm font-black text-slate-700 uppercase tracking-wider ml-1 block">Tautan Google Drive</label>
+                    <input v-model="linkUrl" type="url" class="w-full px-4 py-3 sm:px-5 sm:py-3.5 rounded-xl bg-white border-2 border-slate-200 focus:border-blue-700 focus:ring-4 focus:ring-blue-700/5 outline-none transition-all font-bold text-slate-900 text-sm sm:text-base placeholder:text-slate-400" placeholder="https://drive.google.com/file/d/.../view" :required="uploadType === 'LINK'" />
+                    <p class="text-[10px] font-bold text-slate-500 uppercase leading-normal tracking-tight">
                       * Akses link harus disetel ke "Siapa saja yang memiliki link" dan opsi download diizinkan.
                     </p>
                   </div>
