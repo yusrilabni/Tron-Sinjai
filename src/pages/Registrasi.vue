@@ -297,9 +297,6 @@
                 <div class="space-y-2">
                   <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Mulai Ditayangkan Pada</label>
                   <input v-model="form.tanggal_mulai" type="date" :min="todayDate" autocomplete="off" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-2 border-slate-50 focus:border-blue-700 focus:bg-white outline-none transition-all font-black text-slate-900" required />
-                  <p class="text-[9px] font-bold text-slate-400 uppercase tracking-normal leading-snug mt-1.5 ml-1">
-                    * Konten wajib diajukan minimal H-7 (7 hari sebelum) rencana tanggal mulai ditayangkan.
-                  </p>
                   
                   <!-- Consequence warning for FORM_STANDARD -->
                   <div v-if="viewMode === 'FORM_STANDARD' && form.tanggal_mulai" class="mt-2 p-3 rounded-xl border text-[9px] font-black uppercase tracking-wider leading-relaxed" :class="maxDurasiStandard >= 3 ? 'bg-blue-50/50 border-blue-100 text-blue-700' : 'bg-red-50 border-red-100 text-red-600 animate-pulse'">
@@ -364,9 +361,6 @@
                 <div class="space-y-2">
                   <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Tanggal Puncak Acara / Event</label>
                   <input v-model="tanggalAcara" type="date" :min="todayDate" autocomplete="off" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-2 border-slate-50 focus:border-blue-700 focus:bg-white outline-none transition-all font-black text-slate-900" required />
-                  <p class="text-[9px] font-bold text-slate-400 uppercase tracking-normal leading-snug mt-1.5 ml-1">
-                    * Konten wajib diajukan minimal H-7 (7 hari sebelum) rencana tanggal pelaksanaan puncak acara.
-                  </p>
                 </div>
                 
                 <div class="space-y-2 flex flex-col justify-end">
