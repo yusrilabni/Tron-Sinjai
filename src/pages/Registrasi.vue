@@ -390,7 +390,7 @@
                     <div class="space-y-2">
                       <div>
                         <span class="font-black text-slate-500 block">📅 PENGURANGAN DURASI TAYANG:</span>
-                        Jadwal tayang tidak maksimal 3 hari jika pengajuan mendesak. Durasi disesuaikan otomatis dengan sisa hari dari tanggal upload ke puncak acara (Minimal H-7).
+                        Jadwal tayang dikurangi jika pengajuan dikirim mendesak (kurang dari H-7 hari puncak). Hari mulai tayang otomatis bergeser mendekati hari-H acara sehingga durasi berkurang (contoh: pengajuan H-2 hanya mendapat 1 hari tayang).
                       </div>
                       <div class="pt-1.5 border-t border-slate-200/30">
                         <span class="font-black text-slate-500 block">🔍 VERIFIKASI TANGGAL KONTEN:</span>
