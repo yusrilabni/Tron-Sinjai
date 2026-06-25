@@ -663,7 +663,7 @@ const goBack = () => {
 }
 
 const copySpecialLink = () => {
-  const link = `${window.location.origin}/registrasi?special=1`
+  const link = `${window.location.origin}/registrasi-internal`
   navigator.clipboard.writeText(link)
   alert('🔗 Link khusus berhasil disalin! Bagikan link ini ke instansi yang membutuhkan agar dapat mendaftar dengan durasi maksimal 30 hari.')
 }
@@ -856,9 +856,15 @@ onMounted(() => {
     fetchInitialData()
   }
   
-  // Cek query parameter "special" atau "type"
+  // Cek rute path atau query parameter
+  const path = window.location.pathname
   const urlParams = new URLSearchParams(window.location.search)
-  if (urlParams.get('special') === '1' || urlParams.get('type') === 'internal-special') {
+  if (
+    path === '/registrasi-internal' ||
+    path.endsWith('/registrasi-internal') ||
+    urlParams.get('special') === '1' ||
+    urlParams.get('type') === 'internal-special'
+  ) {
     viewMode.value = 'FORM_SPECIAL'
     showGuidelineModal.value = true
     guidelineAgreed.value = false
