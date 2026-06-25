@@ -122,18 +122,34 @@ function doGet(e) {
   } catch (err) { return response({ success: false, message: "Server GET Error: " + err.toString() }); }
 }
 
+function getSessionsSheet() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName('Sessions_Admin');
+  if (!sheet) {
+    sheet = ss.insertSheet('Sessions_Admin');
+    sheet.appendRow(['Token', 'Username', 'Expires']);
+  }
+  return sheet;
+}
+
 function validateAdminToken(token) {
   if (!token) return null;
   try {
-    const prop = PropertiesService.getScriptProperties().getProperty("session_" + token);
-    if (!prop) return null;
-    const session = JSON.parse(prop);
+    const sheet = getSessionsSheet();
+    const data = sheet.getDataRange().getValues();
     const now = new Date().getTime();
-    if (now > session.expires) {
-      PropertiesService.getScriptProperties().deleteProperty("session_" + token);
-      return null;
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][0] === token) {
+        const expires = parseInt(data[i][2]) || 0;
+        if (now <= expires) {
+          return data[i][1]; // return username
+        } else {
+          sheet.deleteRow(i + 1);
+          return null;
+        }
+      }
     }
-    return session.username;
+    return null;
   } catch (e) {
     return null;
   }
@@ -579,36 +595,30 @@ function handleChunkUpload(payload) {
 }
 
 function handleLogin(payload) {
-  const data = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Users_Admin').getDataRange().getValues();
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const data = ss.getSheetByName('Users_Admin').getDataRange().getValues();
   for (let i = 1; i < data.length; i++) {
     if (data[i][0] === payload.username && data[i][1] === payload.password) {
       writeLog(data[i][0], "LOGIN", "Admin masuk ke sistem");
       
-      // Bersihkan sesi yang kadaluarsa untuk mencegah penumpukan
+      const token = "tok_" + Utilities.getUuid().replace(/-/g, "");
+      const now = new Date().getTime();
+      const expires = now + (6 * 60 * 60 * 1000); // 6 Jam
+      
+      const sessionSheet = getSessionsSheet();
+      
+      // Bersihkan sesi yang kadaluarsa untuk mencegah penumpukan baris
       try {
-        const props = PropertiesService.getScriptProperties();
-        const allProps = props.getProperties();
-        const now = new Date().getTime();
-        for (let key in allProps) {
-          if (key.indexOf("session_") === 0) {
-            try {
-              const session = JSON.parse(allProps[key]);
-              if (now > session.expires) {
-                props.deleteProperty(key);
-              }
-            } catch (err) {
-              props.deleteProperty(key);
-            }
+        const sessionData = sessionSheet.getDataRange().getValues();
+        for (let j = sessionData.length - 1; j >= 1; j--) {
+          const exp = parseInt(sessionData[j][2]) || 0;
+          if (now > exp) {
+            sessionSheet.deleteRow(j + 1);
           }
         }
-      } catch (e) {}
-
-      const token = "tok_" + Utilities.getUuid().replace(/-/g, "");
-      const sessionData = {
-        username: data[i][0],
-        expires: new Date().getTime() + (6 * 60 * 60 * 1000) // Valid 6 Jam
-      };
-      PropertiesService.getScriptProperties().setProperty("session_" + token, JSON.stringify(sessionData));
+      } catch (err) {}
+      
+      sessionSheet.appendRow([token, data[i][0], expires]);
       return response({ success: true, user: { username: data[i][0], role: data[i][2] }, token: token });
     }
   }

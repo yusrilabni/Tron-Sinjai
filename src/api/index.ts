@@ -9,9 +9,9 @@ const api = axios.create({
   headers: { 'Content-Type': 'text/plain;charset=utf-8' }
 })
 
-const handleApiResponse = (data: any) => {
+const handleApiResponse = (data: any, action?: string) => {
   if (data && data.success === false && data.message && (data.message.includes('Akses ditolak') || data.message.includes('tidak sah'))) {
-    console.warn('[API] Session expired or access denied, logging out...');
+    console.warn(`[API] Session expired or access denied on action: ${action || 'unknown'}, logging out...`);
     localStorage.removeItem('admin_token')
     localStorage.removeItem('admin_user')
     window.location.href = '/login?expired=1'
@@ -29,7 +29,7 @@ export const post = async (action: string, payload: any = {}, config: any = {}) 
       payload
     }, config)
     console.log(`[API] Response for ${action}:`, response.data);
-    return handleApiResponse(response.data)
+    return handleApiResponse(response.data, action)
   } catch (error: any) {
     console.error(`[API] Error in ${action}:`, error.response?.data || error.message)
     throw error
@@ -78,7 +78,7 @@ export const getGallery = async () => {
 export const getSubmissions = async () => {
   const token = localStorage.getItem('admin_token') || ''
   const response = await axios.get(`${API_URL}?action=getSubmissions&admin_token=${token}`)
-  return handleApiResponse(response.data)
+  return handleApiResponse(response.data, 'getSubmissions')
 }
 
 export const getPublicLogs = async () => {
@@ -89,7 +89,7 @@ export const getPublicLogs = async () => {
 export const getSettings = async () => {
   const token = localStorage.getItem('admin_token') || ''
   const response = await api.get(`${API_URL}?action=getSettings&admin_token=${token}`)
-  return handleApiResponse(response.data)
+  return handleApiResponse(response.data, 'getSettings')
 }
 
 export const updateSettings = async (payload: any) => {
@@ -99,7 +99,7 @@ export const updateSettings = async (payload: any) => {
 export const getLogs = async () => {
   const token = localStorage.getItem('admin_token') || ''
   const response = await axios.get(`${API_URL}?action=getLogs&admin_token=${token}`)
-  return handleApiResponse(response.data)
+  return handleApiResponse(response.data, 'getLogs')
 }
 
 export const getGroups = async () => {
