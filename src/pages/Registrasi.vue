@@ -549,11 +549,15 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, watch, computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { getSettings, post } from '../api'
 
 const viewMode = ref<'CHOOSE_CATEGORY' | 'CHOOSE_INTERNAL_TYPE' | 'FORM_STANDARD' | 'FORM_SPECIAL'>('CHOOSE_CATEGORY')
 const showCommercialModal = ref(false)
 const isAdmin = ref(false)
+
+const router = useRouter()
+const route = useRoute()
 
 const showGuidelineModal = ref(false)
 const guidelineAgreed = ref(false)
@@ -652,9 +656,16 @@ const selectForm = (mode: 'FORM_STANDARD' | 'FORM_SPECIAL') => {
   form.satuan = 'HARI'
   caraDurasi.value = 'DURASI'
   tanggalAkhir.value = ''
+  
+  if (mode === 'FORM_SPECIAL') {
+    router.push('/registrasi-internal')
+  } else {
+    router.push('/registrasi')
+  }
 }
 
 const goBack = () => {
+  router.push('/registrasi')
   if (isAdmin.value && (viewMode.value === 'FORM_STANDARD' || viewMode.value === 'FORM_SPECIAL')) {
     viewMode.value = 'CHOOSE_INTERNAL_TYPE'
   } else {
@@ -850,14 +861,7 @@ const proceedWithSubmit = async () => {
 const copyCode = (code: string) => { navigator.clipboard.writeText(code); alert('Disalin!') }
 const resetView = () => window.location.href = '/'
 
-onMounted(() => {
-  isAdmin.value = !!localStorage.getItem('admin_user')
-  if (isAdmin.value) {
-    fetchInitialData()
-  }
-  
-  // Cek rute path atau query parameter
-  const path = window.location.pathname
+const checkRoutePath = (path: string) => {
   const urlParams = new URLSearchParams(window.location.search)
   if (
     path === '/registrasi-internal' ||
@@ -868,7 +872,23 @@ onMounted(() => {
     viewMode.value = 'FORM_SPECIAL'
     showGuidelineModal.value = true
     guidelineAgreed.value = false
+  } else {
+    if (viewMode.value === 'FORM_SPECIAL') {
+      viewMode.value = isAdmin.value ? 'CHOOSE_INTERNAL_TYPE' : 'CHOOSE_CATEGORY'
+    }
   }
+}
+
+watch(() => route.path, (newPath) => {
+  checkRoutePath(newPath)
+})
+
+onMounted(() => {
+  isAdmin.value = !!localStorage.getItem('admin_user')
+  if (isAdmin.value) {
+    fetchInitialData()
+  }
+  checkRoutePath(window.location.pathname)
 })
 </script>
 
