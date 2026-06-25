@@ -31,12 +31,18 @@
             <div class="aspect-[3/2] bg-black overflow-hidden rounded-sm relative">
               <!-- DYNAMIC MOCKUP: IMAGE OR VIDEO -->
               <template v-if="mockupContent.isVideo">
-                <iframe 
+                <video 
                   :key="mockupContent.url"
-                  :src="getIframeUrl(mockupContent.url)" 
-                  class="w-full h-full border-none transition-all duration-1000"
-                  allow="autoplay; encrypted-media"
-                ></iframe>
+                  :src="mockupContent.url" 
+                  class="w-full h-full transition-all duration-1000"
+                  :class="mockupFitMode === 'cover' ? 'object-cover' : 'object-contain'"
+                  :muted="mockupMuted"
+                  :loop="activeGalleryItems.length <= 1"
+                  autoplay
+                  playsinline
+                  webkit-playsinline
+                  @ended="advanceSlideshow"
+                ></video>
               </template>
               <img 
                 v-else
@@ -46,14 +52,76 @@
                 :class="mockupContent.isDefault ? 'opacity-40 grayscale' : 'opacity-100'"
                 alt="Sinjai Digital" 
               />
-              <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent pointer-events-none"></div>
-              <div class="absolute bottom-4 left-4 right-4 flex items-end justify-between">
-                 <div class="text-white">
-                   <div class="text-[8px] font-black uppercase opacity-60">Now Airing</div>
-                   <div class="text-sm font-black uppercase tracking-tight line-clamp-1 max-w-[200px]">{{ mockupContent.judul }}</div>
+              
+              <!-- Gradient Overlay -->
+              <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-black/20 pointer-events-none z-20"></div>
+              
+              <!-- Mockup Overlay Information & Controls -->
+              <div class="absolute bottom-4 left-4 right-4 flex items-end justify-between z-30 pointer-events-none">
+                 <div class="text-white pointer-events-auto bg-black/60 backdrop-blur-md px-3 py-2 rounded-xl border border-white/10 shadow-lg">
+                   <div class="text-[8px] font-black uppercase tracking-wider text-blue-400">Now Airing</div>
+                   <div class="text-xs md:text-sm font-black uppercase tracking-tight line-clamp-1 max-w-[110px] sm:max-w-[180px] md:max-w-[240px]">{{ mockupContent.judul }}</div>
                  </div>
-                 <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center animate-ping">
-                   <div class="w-3 h-3 bg-white rounded-full"></div>
+                 
+                 <!-- Video Control Settings HUD -->
+                 <div class="flex items-center gap-2 bg-black/75 backdrop-blur-md border border-white/15 px-3 py-2 rounded-xl shadow-2xl pointer-events-auto transition-all hover:bg-black/90">
+                    <!-- Play / Pause Button -->
+                    <button 
+                      @click.stop="toggleMockupPlay"
+                      class="text-white hover:text-blue-400 transition-colors focus:outline-none"
+                      :title="isSlideshowPaused ? 'Putar Slideshow' : 'Jeda Slideshow'"
+                    >
+                      <svg v-if="isSlideshowPaused" xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+                      </svg>
+                      <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                      </svg>
+                    </button>
+
+                    <!-- Mute / Unmute Button (only shown for video) -->
+                    <button 
+                      v-if="mockupContent.isVideo"
+                      @click.stop="toggleMockupMuted"
+                      class="text-white hover:text-blue-400 transition-colors border-l border-white/10 pl-2 focus:outline-none"
+                      :title="mockupMuted ? 'Aktifkan Suara' : 'Matikan Suara'"
+                    >
+                      <!-- Sound Off / Muted -->
+                      <svg v-if="mockupMuted" xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM12.293 7.293a1 1 0 011.414 0L15 8.586l1.293-1.293a1 1 0 111.414 1.414L16.414 10l1.293 1.293a1 1 0 01-1.414 1.414L15 11.414l-1.293 1.293a1 1 0 01-1.414-1.414L13.586 10l-1.293-1.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                      </svg>
+                      <!-- Sound On -->
+                      <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM18 10a6 6 0 01-8.847 5.303 1 1 0 11.97-1.751A4 4 0 0016 10a4 4 0 00-3.877-3.552 1 1 0 11.97-1.751A6 6 0 0118 10zM14 10a2 2 0 01-3.007 1.73a1 1 0 11.97-1.752A0.001 0.001 0 0012 10c0-.001 0-.002-.001-.003a1 1 0 11.97-1.753A2 2 0 0114 10z" clip-rule="evenodd" />
+                      </svg>
+                    </button>
+
+                    <!-- Aspect Ratio Toggle Button (Cover / Contain) -->
+                    <button 
+                      @click.stop="toggleMockupFitMode"
+                      class="text-white hover:text-blue-400 transition-colors border-l border-white/10 pl-2 focus:outline-none"
+                      :title="mockupFitMode === 'cover' ? 'Fit Video' : 'Isi Layar'"
+                    >
+                      <!-- Cover Mode Icon (fills screen) -->
+                      <svg v-if="mockupFitMode === 'cover'" xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h4a1 1 0 010 2H6.414l2.293 2.293a1 1 0 11-1.414 1.414L5 6.414V8a1 1 0 01-2 0V4zm9 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-2 0V6.414l-2.293 2.293a1 1 0 11-1.414-1.414L15 6.414V5h-2a1 1 0 01-1-1zM5.707 12.293a1 1 0 010 1.414L3.414 16H5a1 1 0 110 2H1a1 1 0 01-1-1v-4a1 1 0 112 0v1.586l2.293-2.293a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0L18 14.586V13a1 1 0 112 0v4a1 1 0 01-1 1h-4a1 1 0 110-2h1.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                      </svg>
+                      <!-- Contain Mode Icon (fits whole video) -->
+                      <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M12.586 7L15 4.586V6a1 1 0 102 0V2h-4a1 1 0 100 2h1.586L12 6.414A1 1 0 0012.586 7zm-5.172 0L5 4.586V6a1 1 0 01-2 0V2h4a1 1 0 010 2H5.414L7.828 6.414A1 1 0 017.414 7h-.001zm0 6L5 15.414V14a1 1 0 10-2 0v4h4a1 1 0 100-2H5.414L7.828 13.586A1 1 0 007.414 13h-.001zm5.172 0L15 15.414V14a1 1 0 112 0v4h-4a1 1 0 110-2h1.586L12 13.586a1 1 0 011.414-.001z" clip-rule="evenodd" />
+                      </svg>
+                    </button>
+
+                    <!-- Manual Next Item Button -->
+                    <button 
+                      @click.stop="advanceSlideshow"
+                      class="text-white hover:text-blue-400 transition-colors border-l border-white/10 pl-2 focus:outline-none"
+                      title="Materi Selanjutnya"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                      </svg>
+                    </button>
                  </div>
               </div>
             </div>
@@ -424,6 +492,27 @@ const loading = ref(true)
 const currentMockupIndex = ref(0)
 let slideshowTimeout: any = null
 
+const mockupMuted = ref(true)
+const mockupFitMode = ref<'cover' | 'contain'>('cover')
+const isSlideshowPaused = ref(false)
+
+const toggleMockupMuted = () => {
+  mockupMuted.value = !mockupMuted.value
+}
+
+const toggleMockupPlay = () => {
+  isSlideshowPaused.value = !isSlideshowPaused.value
+  if (isSlideshowPaused.value) {
+    if (slideshowTimeout) clearTimeout(slideshowTimeout)
+  } else {
+    setupNextSlideshowTimer()
+  }
+}
+
+const toggleMockupFitMode = () => {
+  mockupFitMode.value = mockupFitMode.value === 'cover' ? 'contain' : 'cover'
+}
+
 const activeAlbum = ref<string[] | null>(null)
 const activeAlbumTitle = ref('')
 const activeAlbumIndex = ref(0)
@@ -532,6 +621,7 @@ const advanceSlideshow = () => {
 
 const setupNextSlideshowTimer = () => {
   if (slideshowTimeout) clearTimeout(slideshowTimeout)
+  if (isSlideshowPaused.value) return
   if (activeGalleryItems.value.length <= 1) return
 
   const items = activeGalleryItems.value
@@ -571,17 +661,6 @@ const getStreamUrl = (url: string) => {
     if (url.includes('id=')) id = url.split('id=')[1].split('&')[0]
     else if (url.includes('/d/')) id = url.split('/d/')[1].split('/')[0]
     return `https://drive.google.com/uc?id=${id}&export=download`
-  }
-  return url
-}
-
-const getIframeUrl = (url: string) => {
-  if (!url) return ''
-  if (url.includes('drive.google.com')) {
-    let id = ''
-    if (url.includes('id=')) id = url.split('id=')[1].split('&')[0]
-    else if (url.includes('/d/')) id = url.split('/d/')[1].split('/')[0]
-    if (id) return `https://drive.google.com/file/d/${id}/preview?autoplay=1`
   }
   return url
 }
