@@ -422,6 +422,10 @@ function handleAssembleFile(payload) {
 
 function handlePengajuan(payload) {
   try {
+    if (payload.formMode === 'FORM_STANDARD' && (parseInt(payload.durasi) || 0) > 3) {
+      return response({ success: false, message: 'Durasi penayangan Formulir Publik maksimal 3 hari!' });
+    }
+
     const ss = SpreadsheetApp.getActiveSpreadsheet();
     const sheetName = payload.jenis === 'BERBAYAR' ? 'Pengajuan_Berbayar' : 'Pengajuan_OPD';
     const sheet = ss.getSheetByName(sheetName);

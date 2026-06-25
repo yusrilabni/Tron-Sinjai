@@ -268,7 +268,7 @@
                   </button>
                 </div>
                 <p class="text-[9px] font-bold text-slate-400 uppercase tracking-normal leading-relaxed ml-1">
-                  {{ metodeJadwal === 'MANUAL' ? '* Anda menentukan tanggal mulai tayang dan durasi hari tayang secara manual.' : '* Sistem akan otomatis menjadwalkan tayang mulai H-3 sebelum puncak acara hingga hari H acara selesai.' }}
+                  {{ metodeJadwal === 'MANUAL' ? '* Anda menentukan tanggal mulai tayang dan durasi hari tayang secara manual.' : '* Sistem akan otomatis menjadwalkan tayang mulai H-2 sebelum puncak acara hingga hari H acara selesai.' }}
                 </p>
               </div>
 
@@ -357,7 +357,7 @@
                       Mulai: <span class="text-blue-700">{{ form.tanggal_mulai }}</span> s.d. Selesai: <span class="text-blue-700">{{ tanggalAkhir }}</span>
                     </p>
                     <span class="text-[9px] font-black text-emerald-600 uppercase tracking-wider block">
-                      Total: {{ form.durasi }} Hari Tayang (H-3 s.d. Hari-H Acara)
+                      Total: {{ form.durasi }} Hari Tayang (H-2 s.d. Hari-H Acara)
                     </span>
                   </div>
                   <div v-else class="p-4 bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl flex items-center justify-center min-h-[70px]">
@@ -725,9 +725,9 @@ const calculateScheduleFromEvent = () => {
     const eventMonth = parseInt(parts[1], 10) - 1
     const eventDay = parseInt(parts[2], 10)
     
-    // Hitung tanggal mulai ideal (H-3 puncak)
+    // Hitung tanggal mulai ideal (H-2 puncak agar total 3 hari tayang: H-2, H-1, Hari-H)
     const idealStart = new Date(eventYear, eventMonth, eventDay)
-    idealStart.setDate(idealStart.getDate() - 3)
+    idealStart.setDate(idealStart.getDate() - 2)
     
     const y = idealStart.getFullYear()
     const m = String(idealStart.getMonth() + 1).padStart(2, '0')
@@ -753,7 +753,11 @@ const calculateScheduleFromEvent = () => {
     const diffDays = Math.round(diffTime / (1000 * 3600 * 24))
     
     if (diffDays >= 0) {
-      form.durasi = diffDays + 1
+      let computedDurasi = diffDays + 1
+      if (viewMode.value === 'FORM_STANDARD' && computedDurasi > 3) {
+        computedDurasi = 3
+      }
+      form.durasi = computedDurasi
       form.satuan = 'HARI'
     } else {
       form.durasi = 0
@@ -825,12 +829,7 @@ const copySpecialLink = () => {
 watch(() => form.durasi, (newVal) => {
   // Hanya kunci 3 hari jika di FORM_STANDARD (publik)
   if (viewMode.value === 'FORM_STANDARD' && newVal && Number(newVal) > 3) {
-    if (metodeJadwal.value !== 'ACARA') {
-      form.durasi = 3
-    } else if (Number(newVal) > 4) {
-      // Jika metode ACARA pada form standard, maksimal 4 hari (H-3 s.d. Hari H)
-      form.durasi = 4
-    }
+    form.durasi = 3
   }
   // Kunci 30 hari jika di FORM_SPECIAL (khusus)
   if (viewMode.value === 'FORM_SPECIAL' && newVal && Number(newVal) > 30) {
@@ -914,6 +913,9 @@ const handlePreSubmit = () => {
     if (!tanggalAcara.value) return alert('Pilih tanggal puncak acara.')
     calculateScheduleFromEvent()
     if (form.durasi <= 0) return alert('⚠️ Tanggal puncak acara tidak boleh sebelum hari ini!')
+    if (viewMode.value === 'FORM_STANDARD' && form.durasi > 3) {
+      return alert('⚠️ Total durasi tayang untuk Formulir Publik tidak boleh lebih dari 3 hari!')
+    }
   } else {
     if (!form.tanggal_mulai) return alert('Pilih tanggal mulai tayang.')
     if (viewMode.value === 'FORM_SPECIAL') {
@@ -946,6 +948,10 @@ const proceedWithSubmit = async () => {
   showWarning.value = false
   if (isSubmitting.value) return
   
+  if (viewMode.value === 'FORM_STANDARD' && form.durasi > 3) {
+    return alert('⚠️ Total durasi tayang untuk Formulir Publik tidak boleh lebih dari 3 hari!')
+  }
+  
   if (uploadType.value === 'FILE') {
     if (!form.fileObject) return alert('Unggah berkas materi.')
   } else {
@@ -972,7 +978,7 @@ const proceedWithSubmit = async () => {
       const sanitizedTitle = form.judul.substring(0, 20).replace(/[^a-z0-9]/gi, '-');
       const extension = form.fileName.split('.').pop();
       finalFileName = `REG_${sanitizedTitle}_${Math.random().toString(36).substr(2, 5).toUpperCase()}_${Date.now()}.${extension}`;
-
+ 
       statusLabel.value = 'Menyusun File...'
       uploadProgress.value = 99
       const assembleRes = await post('assembleChunkFile', {
@@ -994,6 +1000,7 @@ const proceedWithSubmit = async () => {
     uploadProgress.value = 90
     const res = await post('submitPengajuan', { 
       ...form, 
+      formMode: viewMode.value,
       kategori: form.kategori === 'Lainnya' ? form.kategori_kustom : form.kategori,
       fileUrl: finalFileUrl, 
       fileName: finalFileName,
