@@ -211,34 +211,40 @@
     <!-- Modal Kelola Status (Update) -->
     <transition name="page">
       <div v-if="activeSub" class="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-slate-900/80 backdrop-blur-sm">
-        <div class="bg-white w-full max-w-lg rounded-xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-          <div class="p-8 border-b-2 border-slate-100 flex justify-between items-center bg-slate-50">
+        <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden flex flex-col h-[600px] max-h-[90vh] animate-in zoom-in-95 duration-200">
+          
+          <!-- Modal Header -->
+          <div class="p-6 border-b-2 border-slate-100 flex justify-between items-center bg-slate-50 shrink-0">
             <h3 class="font-black text-slate-900 uppercase tracking-tight text-sm">Manajemen Status</h3>
-            <button @click="activeSub = null" class="text-slate-400 hover:text-slate-900"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg></button>
+            <button @click="activeSub = null" class="text-slate-400 hover:text-slate-900 cursor-pointer">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
           </div>
-          <div class="p-8 space-y-6">
+          
+          <!-- Modal Body (Scrollable Area) -->
+          <div class="p-6 space-y-4 overflow-y-auto flex-grow min-h-0">
             <div class="p-6 bg-slate-50 rounded border-2 border-slate-100 space-y-4">
                <div class="flex justify-between items-start">
                   <div>
-                    <div class="text-[8px] font-black text-slate-400 uppercase tracking-widest">Registrasi</div>
-                    <div class="font-black text-slate-900 font-mono text-sm">{{ activeSub.no_registrasi }}</div>
+                     <div class="text-[8px] font-black text-slate-400 uppercase tracking-widest">Registrasi</div>
+                     <div class="font-black text-slate-900 font-mono text-sm">{{ activeSub.no_registrasi }}</div>
                   </div>
                   <div class="text-right" v-if="activeSub.biaya > 0">
-                    <div class="text-[8px] font-black text-slate-400 uppercase tracking-widest">Tagihan</div>
-                    <div class="font-black text-emerald-700">Rp{{ formatIDR(activeSub.biaya) }}</div>
+                     <div class="text-[8px] font-black text-slate-400 uppercase tracking-widest">Tagihan</div>
+                     <div class="font-black text-emerald-700">Rp{{ formatIDR(activeSub.biaya) }}</div>
                   </div>
                </div>
             </div>
 
             <!-- Status Choice -->
-            <div class="space-y-4">
+            <div class="space-y-3">
               <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Pilih Tindakan</label>
-              <div class="flex flex-col gap-3">
+              <div class="grid grid-cols-2 gap-3">
                 <button 
                   type="button"
                   @click="updateForm.status = 'DISETUJUI'" 
                   :class="updateForm.status === 'DISETUJUI' ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20' : 'bg-slate-50 text-slate-500 hover:bg-slate-100 border-slate-100'" 
-                  class="py-4 rounded-xl border font-black text-[10px] uppercase tracking-wider transition-all"
+                  class="py-3 rounded-xl border font-black text-[10px] uppercase tracking-wider transition-all cursor-pointer"
                 >
                   Diterima (Sesuai Jadwal)
                 </button>
@@ -246,7 +252,7 @@
                   type="button"
                   @click="updateForm.status = 'TAYANG'" 
                   :class="updateForm.status === 'TAYANG' ? 'bg-blue-700 text-white shadow-lg shadow-blue-500/20' : 'bg-slate-50 text-slate-500 hover:bg-slate-100 border-slate-100'" 
-                  class="py-4 rounded-xl border font-black text-[10px] uppercase tracking-wider transition-all"
+                  class="py-3 rounded-xl border font-black text-[10px] uppercase tracking-wider transition-all cursor-pointer"
                 >
                   Diterima (Langsung Tayang)
                 </button>
@@ -254,7 +260,7 @@
                   type="button"
                   @click="updateForm.status = 'EXPIRED'" 
                   :class="updateForm.status === 'EXPIRED' ? 'bg-amber-600 text-white shadow-lg shadow-amber-500/20' : 'bg-slate-50 text-slate-500 hover:bg-slate-100 border-slate-100'" 
-                  class="py-4 rounded-xl border font-black text-[10px] uppercase tracking-wider transition-all"
+                  class="py-3 rounded-xl border font-black text-[10px] uppercase tracking-wider transition-all cursor-pointer"
                 >
                   Set Kedaluwarsa
                 </button>
@@ -262,7 +268,7 @@
                   type="button"
                   @click="updateForm.status = 'DITOLAK'" 
                   :class="updateForm.status === 'DITOLAK' ? 'bg-red-600 text-white shadow-lg shadow-red-500/20' : 'bg-slate-50 text-slate-500 hover:bg-slate-100 border-slate-100'" 
-                  class="py-4 rounded-xl border font-black text-[10px] uppercase tracking-wider transition-all"
+                  class="py-3 rounded-xl border font-black text-[10px] uppercase tracking-wider transition-all cursor-pointer"
                 >
                   Ditolak
                 </button>
@@ -270,16 +276,16 @@
             </div>
 
             <!-- Tampilkan Date Picker HANYA jika status asal materi adalah EXPIRED -->
-            <div v-if="activeSub && activeSub.status === 'EXPIRED' && (updateForm.status === 'DISETUJUI' || updateForm.status === 'TAYANG')" class="space-y-3 p-6 bg-emerald-50 rounded-xl border-2 border-emerald-100 animate-in slide-in-from-top-2 duration-300">
+            <div v-if="activeSub && activeSub.status === 'EXPIRED' && (updateForm.status === 'DISETUJUI' || updateForm.status === 'TAYANG')" class="space-y-2 p-4 bg-emerald-50 rounded-xl border-2 border-emerald-100 animate-in slide-in-from-top-2 duration-300">
                <label class="text-[10px] font-black text-emerald-700 uppercase tracking-widest">Tanggal Mulai Baru</label>
-               <input v-model="updateForm.tanggal_mulai" type="date" class="w-full px-6 py-4 rounded-xl bg-white border-2 border-slate-200 focus:border-emerald-500 outline-none transition-all font-black text-slate-900" required />
+               <input v-model="updateForm.tanggal_mulai" type="date" class="w-full px-4 py-2.5 rounded-xl bg-white border-2 border-slate-200 focus:border-emerald-500 outline-none transition-all font-black text-slate-900" required />
                <p class="text-[9px] font-bold text-emerald-500 uppercase">* Masukkan tanggal mulai baru untuk mengaktifkan kembali materi yang kedaluwarsa.</p>
             </div>
 
             <!-- Conditional File Upload for TAYANG -->
-            <div v-if="updateForm.status === 'TAYANG'" class="space-y-3 p-6 bg-blue-50 rounded-xl border-2 border-blue-100 animate-in slide-in-from-top-2 duration-300">
+            <div v-if="updateForm.status === 'TAYANG'" class="space-y-2 p-4 bg-blue-50 rounded-xl border-2 border-blue-100 animate-in slide-in-from-top-2 duration-300">
                <label class="text-[10px] font-black text-blue-700 uppercase tracking-widest">Dokumentasi Tayang</label>
-               <input type="file" @change="handleDocUpload" accept="image/*,video/*" class="w-full text-[10px] font-black file:bg-blue-700 file:text-white file:border-0 file:px-4 file:py-2 file:rounded" />
+               <input type="file" @change="handleDocUpload" accept="image/*,video/*" class="w-full text-[10px] font-black file:bg-blue-700 file:text-white file:border-0 file:px-4 file:py-2 file:rounded cursor-pointer" />
                <p class="text-[9px] font-bold text-blue-400 uppercase">* Foto/Video materi saat sudah tampil di videotron (bisa diunggah nanti langsung pada baris tabel utama).</p>
             </div>
 
@@ -289,7 +295,7 @@
             </div>
 
             <!-- Allow Edit Toggle (Only for DITOLAK or special cases) -->
-            <div v-if="updateForm.status === 'DITOLAK'" class="flex items-center justify-between p-6 bg-amber-50 rounded-xl border-2 border-amber-100 animate-in slide-in-from-top-2">
+            <div v-if="updateForm.status === 'DITOLAK'" class="flex items-center justify-between p-4 bg-amber-50 rounded-xl border-2 border-amber-100 animate-in slide-in-from-top-2">
                <div class="space-y-0.5">
                   <p class="text-[10px] font-black text-amber-700 uppercase tracking-widest">Izinkan Perbaikan</p>
                   <p class="text-[9px] font-bold text-amber-500 uppercase">User dapat mengedit data & file materi.</p>
@@ -299,8 +305,16 @@
                   <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
                </label>
             </div>
-
-            <button @click="handleUpdate" :disabled="updating || !updateForm.status" class="w-full py-5 bg-blue-700 text-white font-black text-xs uppercase tracking-[0.3em] rounded hover:bg-slate-900 transition-all disabled:bg-slate-200">
+          </div>
+          
+          <!-- Modal Footer (Fixed at bottom of modal) -->
+          <div class="p-6 bg-slate-50 border-t-2 border-slate-100 flex justify-end gap-3 shrink-0">
+            <button @click="activeSub = null" class="px-6 py-3 bg-white border-2 border-slate-200 rounded-xl font-black text-[9px] uppercase tracking-widest hover:bg-slate-50 transition-all cursor-pointer">Batal</button>
+            <button 
+              @click="handleUpdate" 
+              :disabled="updating || !updateForm.status" 
+              class="px-8 py-3 bg-blue-700 text-white rounded-xl font-black text-[9px] uppercase tracking-widest hover:bg-slate-900 transition-all cursor-pointer disabled:bg-slate-200"
+            >
                {{ updating ? 'Memproses...' : 'Update & Simpan' }}
             </button>
           </div>
