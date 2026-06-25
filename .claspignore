@@ -1,0 +1,6 @@
+# Abaikan semua file di dalam folder proyek
+**/*
+
+# Kecualikan file Apps Script agar tetap diunggah
+!google-apps-script.js
+!appsscript.json
