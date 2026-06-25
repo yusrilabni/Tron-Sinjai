@@ -307,10 +307,10 @@
                       ✓ Pengajuan tepat waktu (>= 3 hari sebelum tayang). Durasi maksimal 3 hari diperbolehkan.
                     </span>
                     <span v-else-if="maxDurasiStandard === 2">
-                      ⚠️ KONSEKUENSI PENGAJUAN H-2: Karena pengajuan mendesak, durasi tayang dibatasi maksimal 2 hari.
+                      ⚠️ KONSEKUENSI PENGAJUAN MENDESAK (H-2 atau H-1): Karena pengajuan mendesak, durasi tayang dibatasi maksimal 2 hari.
                     </span>
                     <span v-else>
-                      ⚠️ KONSEKUENSI PENGAJUAN H-1/HARI-H: Karena pengajuan sangat mendesak, durasi tayang dibatasi maksimal 1 hari.
+                      ⚠️ KONSEKUENSI PENGAJUAN SANGAT MENDESAK (Hari-H): Karena pengajuan pada hari penayangan, durasi tayang dibatasi maksimal 1 hari.
                     </span>
                   </div>
                 </div>
@@ -379,12 +379,24 @@
                       Total: {{ form.durasi }} Hari Tayang (H-2 s.d. Hari-H Acara)
                     </span>
                     <span v-if="viewMode === 'FORM_STANDARD' && form.durasi < 3" class="text-[9px] font-black text-rose-600 uppercase tracking-wider block animate-pulse mt-1">
-                      ⚠️ KONSEKUENSI PENGAJUAN MENDESAK: Durasi tayang dipotong menjadi {{ form.durasi }} hari.
+                      ⚠️ KONSEKUENSI PENGAJUAN MENDESAK: Jadwal tayang tidak maksimal 3 hari, disesuaikan dengan sisa hari menuju puncak acara (dipotong menjadi {{ form.durasi }} hari).
                     </span>
                   </div>
                   <div v-else class="p-4 bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl flex items-center justify-center min-h-[70px]">
                     <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest text-center">Tentukan tanggal puncak acara untuk menghitung jadwal</span>
                   </div>
+                </div>
+              </div>
+
+              <!-- Verification policy alert box -->
+              <div class="p-5 bg-slate-50 border-2 border-slate-100 rounded-2xl text-[10px] font-bold text-slate-500 uppercase tracking-normal leading-relaxed max-w-xl space-y-3">
+                <div>
+                  <span class="font-black text-slate-900 block mb-1">📅 KETENTUAN PENGAJUAN & PENYESUAIAN JADWAL:</span>
+                  Jadwal tayang tidak maksimal 3 hari jika pengajuan dilakukan mendesak. Durasi tayang akan disesuaikan secara otomatis berdasarkan sisa hari antara tanggal Anda mengunggah (upload) dengan tanggal puncak acara (misalnya: jika upload tanggal 25 dan acara tanggal 27, maka jadwal tayang sudah terpotong 2 hari). Oleh karena itu, hindari pengajuan mendesak dan lakukan pengajuan minimal H-7 dari tanggal puncak acara.
+                </div>
+                <div class="pt-2.5 border-t border-slate-200/50">
+                  <span class="font-black text-slate-900 block mb-1">🔍 VERIFIKASI KESESUAIAN TANGGAL KONTEN:</span>
+                  Admin akan melakukan verifikasi ketat untuk mencocokkan tanggal penayangan yang diinput di form dengan tanggal acara yang tertera di dalam flyer/video materi yang dikirimkan. Jika terdapat ketidakcocokan, pengajuan Anda dapat ditolak oleh Admin.
                 </div>
               </div>
             </div>
@@ -703,7 +715,8 @@ const maxDurasiStandard = computed(() => {
   const diff = getDiffDaysFromToday(form.tanggal_mulai)
   if (diff >= 3) return 3
   if (diff === 2) return 2
-  return 1 // diff <= 1
+  if (diff === 1) return 2
+  return 1 // diff === 0
 })
 
 watch(maxDurasiStandard, (newMax) => {
@@ -781,23 +794,26 @@ const calculateScheduleFromEvent = () => {
     const leadTimeDays = Math.round((eventDate.getTime() - todayZero.getTime()) / (1000 * 3600 * 24))
     
     // Sesuai aturan konsekuensi untuk FORM_STANDARD:
-    // Jika lead time acara >= 4 hari: mulai H-2 (durasi 3 hari)
-    // Jika lead time acara === 3 hari: mulai H-1 (durasi 2 hari)
-    // Jika lead time acara === 2 hari: mulai H-0 (durasi 1 hari)
-    // Jika lead time acara === 1 hari: mulai H-0 (durasi 1 hari)
+    // Jika lead time acara >= 3 hari: mulai H-2 (durasi 3 hari)
+    // Jika lead time acara === 2 hari: mulai H-1 (durasi 2 hari)
+    // Jika lead time acara === 1 hari: mulai H-1 (durasi 2 hari)
     // Jika lead time acara === 0 hari: mulai H-0 (durasi 1 hari)
     let offsetDays = 2 // default H-2
     let maxDur = 3
     
     if (viewMode.value === 'FORM_STANDARD') {
-      if (leadTimeDays >= 4) {
+      if (leadTimeDays >= 3) {
         offsetDays = 2
         maxDur = 3
-      } else if (leadTimeDays === 3) {
+      } else if (leadTimeDays === 2) {
+        offsetDays = 1 // start tomorrow (H-1)
+        maxDur = 2
+      } else if (leadTimeDays === 1) {
+        // Event tomorrow. Show starting today (H-1) to tomorrow (Hari-H) -> 2 days.
         offsetDays = 1
         maxDur = 2
       } else {
-        // leadTimeDays <= 2
+        // Event today. Show starting today (Hari-H) -> 1 day.
         offsetDays = 0
         maxDur = 1
       }
