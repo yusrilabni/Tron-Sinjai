@@ -321,7 +321,7 @@
                 <!-- DURASI BIASA -->
                 <div v-else class="space-y-2">
                   <label class="text-xs sm:text-sm font-black text-slate-700 uppercase tracking-wider ml-1">
-                    {{ viewMode === 'FORM_STANDARD' ? 'Durasi Penayangan (Tetap 3 Hari)' : 'Durasi Penayangan (Maks 30 Hari)' }}
+                    {{ viewMode === 'FORM_STANDARD' ? 'Durasi Penayangan (Maks 3 Hari)' : 'Durasi Penayangan (Maks 30 Hari)' }}
                   </label>
                   <div class="flex gap-2">
                     <input 
@@ -329,12 +329,8 @@
                       type="number" 
                       min="1" 
                       :max="viewMode === 'FORM_STANDARD' ? 3 : 30" 
-                      :disabled="viewMode === 'FORM_STANDARD'"
                       autocomplete="off" 
-                      :class="viewMode === 'FORM_STANDARD' 
-                        ? 'bg-slate-50 text-slate-500 cursor-not-allowed border-slate-200' 
-                        : 'bg-white text-slate-900 border-slate-200 focus:border-blue-700 focus:ring-4 focus:ring-blue-700/5'"
-                      class="flex-grow px-4 py-3 sm:px-5 sm:py-3.5 rounded-xl border-2 outline-none transition-all font-black text-sm sm:text-base" 
+                      class="flex-grow px-4 py-3 sm:px-5 sm:py-3.5 rounded-xl bg-white border-2 border-slate-200 focus:border-blue-700 focus:ring-4 focus:ring-blue-700/5 outline-none transition-all font-black text-slate-900 text-sm sm:text-base" 
                       required 
                     />
                     
