@@ -418,7 +418,7 @@
 
                   <!-- Input Upload File -->
                   <div v-if="uploadType === 'FILE'" class="space-y-2 pt-2 animate-fade-in">
-                    <label class="text-xs sm:text-sm font-black text-slate-700 uppercase tracking-wider ml-1 block">Pilih Berkas (Gambar/Video - Maks 100MB)</label>
+                    <label class="text-xs sm:text-sm font-black text-slate-700 uppercase tracking-wider ml-1 block">Pilih Berkas (Gambar: Maks 10MB / Video: {{ viewMode === 'FORM_SPECIAL' ? 'Maks 50MB' : 'Maks 30MB' }})</label>
                     <input type="file" @change="handleFileUpload" accept="image/*,video/*" class="w-full text-xs font-black text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-slate-900 file:text-white hover:file:bg-blue-700 cursor-pointer" :required="uploadType === 'FILE'" />
                   </div>
 
