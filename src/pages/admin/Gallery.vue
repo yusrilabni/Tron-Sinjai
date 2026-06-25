@@ -452,9 +452,17 @@
                          <div class="space-y-1.5">
                             <div class="flex items-center justify-between">
                                <span class="text-[7px] font-black text-blue-600 uppercase tracking-widest">{{ child.url && child.url.includes('|') ? 'ALBUM' : child.tipe }}</span>
-                               <span class="text-[7px] font-bold text-slate-400 uppercase tracking-widest">{{ formatDate(child.tanggal_mulai || child.tanggal) }}</span>
+                               <div class="flex items-center gap-1.5">
+                                  <span v-if="child.durasi" class="px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded text-[7px] font-black uppercase tracking-wider">⏱️ {{ child.durasi }} {{ child.satuan === 'HARI' ? 'Hari' : child.satuan }}</span>
+                                  <span class="text-[7px] font-bold text-slate-400 uppercase tracking-widest">{{ formatDate(child.tanggal_mulai || child.tanggal) }}</span>
+                               </div>
                             </div>
                             <h4 class="text-sm font-black text-slate-900 leading-tight uppercase line-clamp-2">{{ child.judul }}</h4>
+                            
+                            <!-- Duration Warning Alert -->
+                            <div v-if="child.satuan === 'HARI' && child.durasi < 3" class="mt-1 px-2 py-0.5 bg-red-50 text-red-600 border border-red-100 rounded text-[7px] font-bold uppercase tracking-wider inline-flex items-center gap-1">
+                               <span>⚠️ Tayang tidak maksimal ({{ child.durasi }} Hari)</span>
+                            </div>
                             
                             <!-- Move Group Dropdown Selector -->
                             <div class="pt-1.5 flex items-center gap-1.5">
@@ -540,10 +548,18 @@
                   <div class="p-6 flex-grow flex flex-col justify-between space-y-4">
                      <div class="space-y-2">
                         <div class="flex items-center justify-between">
-                           <span class="text-[8px] font-black text-blue-600 uppercase tracking-widest">{{ item.url && item.url.includes('|') ? 'ALBUM' : item.tipe }}</span>
-                           <span class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{{ formatDate(item.tanggal_mulai || item.tanggal) }}</span>
-                        </div>
-                        <h4 class="text-base font-black text-slate-900 leading-tight uppercase line-clamp-2">{{ item.judul }}</h4>
+                            <span class="text-[8px] font-black text-blue-600 uppercase tracking-widest">{{ item.url && item.url.includes('|') ? 'ALBUM' : item.tipe }}</span>
+                            <div class="flex items-center gap-2">
+                               <span v-if="item.durasi" class="px-2 py-0.5 bg-slate-100 text-slate-600 rounded text-[8px] font-black uppercase tracking-wider">⏱️ {{ item.durasi }} {{ item.satuan === 'HARI' ? 'Hari' : item.satuan }}</span>
+                               <span class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">{{ formatDate(item.tanggal_mulai || item.tanggal) }}</span>
+                            </div>
+                         </div>
+                         <h4 class="text-base font-black text-slate-900 leading-tight uppercase line-clamp-2">{{ item.judul }}</h4>
+                         
+                         <!-- Duration Warning Alert -->
+                         <div v-if="item.satuan === 'HARI' && item.durasi < 3" class="mt-1 px-2.5 py-1 bg-red-50 text-red-600 border border-red-100 rounded-lg text-[8px] font-bold uppercase tracking-wider inline-flex items-center gap-1 animate-pulse">
+                            <span>⚠️ Tayang tidak maksimal ({{ item.durasi }} Hari)</span>
+                         </div>
                          
                          <!-- Group Selector Dropdown -->
                          <div class="pt-2 flex items-center gap-1.5">
@@ -587,7 +603,7 @@
     <!-- Modal Kelola Status (Update) -->
     <transition name="page">
       <div v-if="activeSub" class="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-slate-900/80 backdrop-blur-sm">
-        <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] animate-in zoom-in-95 duration-200">
+        <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200">
           
           <!-- Modal Header -->
           <div class="p-6 border-b-2 border-slate-100 flex justify-between items-center bg-slate-50 shrink-0">
@@ -598,7 +614,7 @@
           </div>
           
           <!-- Modal Body (Scrollable Area) -->
-          <div class="p-8 space-y-6 overflow-y-auto flex-grow">
+          <div class="p-6 space-y-4 overflow-y-auto flex-grow min-h-0">
             <div class="p-6 bg-slate-50 rounded border-2 border-slate-100 space-y-4">
                <div class="flex justify-between items-start">
                   <div>
@@ -609,53 +625,53 @@
             </div>
 
             <!-- Status Choice -->
-            <div class="space-y-4">
-              <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Pilih Tindakan</label>
-              <div class="flex flex-col gap-3">
-                <button 
-                  type="button"
-                  @click="updateForm.status = 'DISETUJUI'" 
-                  :class="updateForm.status === 'DISETUJUI' ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20' : 'bg-slate-50 text-slate-500 hover:bg-slate-100 border-slate-100'" 
-                  class="py-4 rounded-xl border font-black text-[10px] uppercase tracking-wider transition-all cursor-pointer"
-                >
-                  Diterima (Sesuai Jadwal)
-                </button>
-                <button 
-                  type="button"
-                  @click="updateForm.status = 'TAYANG'" 
-                  :class="updateForm.status === 'TAYANG' ? 'bg-blue-700 text-white shadow-lg shadow-blue-500/20' : 'bg-slate-50 text-slate-500 hover:bg-slate-100 border-slate-100'" 
-                  class="py-4 rounded-xl border font-black text-[10px] uppercase tracking-wider transition-all cursor-pointer"
-                >
-                  Diterima (Langsung Tayang)
-                </button>
-                <button 
-                  type="button"
-                  @click="updateForm.status = 'EXPIRED'" 
-                  :class="updateForm.status === 'EXPIRED' ? 'bg-amber-600 text-white shadow-lg shadow-amber-500/20' : 'bg-slate-50 text-slate-500 hover:bg-slate-100 border-slate-100'" 
-                  class="py-4 rounded-xl border font-black text-[10px] uppercase tracking-wider transition-all cursor-pointer"
-                >
-                  Set Kedaluwarsa
-                </button>
-                <button 
-                  type="button"
-                  @click="updateForm.status = 'DITOLAK'" 
-                  :class="updateForm.status === 'DITOLAK' ? 'bg-red-600 text-white shadow-lg shadow-red-500/20' : 'bg-slate-50 text-slate-500 hover:bg-slate-100 border-slate-100'" 
-                  class="py-4 rounded-xl border font-black text-[10px] uppercase tracking-wider transition-all cursor-pointer"
-                >
-                  Ditolak
-                </button>
-              </div>
-            </div>
+            <div class="space-y-3">
+               <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Pilih Tindakan</label>
+               <div class="grid grid-cols-2 gap-3">
+                 <button 
+                   type="button"
+                   @click="updateForm.status = 'DISETUJUI'" 
+                   :class="updateForm.status === 'DISETUJUI' ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20' : 'bg-slate-50 text-slate-500 hover:bg-slate-100 border-slate-100'" 
+                   class="py-3 rounded-xl border font-black text-[10px] uppercase tracking-wider transition-all cursor-pointer"
+                 >
+                   Diterima (Sesuai Jadwal)
+                 </button>
+                 <button 
+                   type="button"
+                   @click="updateForm.status = 'TAYANG'" 
+                   :class="updateForm.status === 'TAYANG' ? 'bg-blue-700 text-white shadow-lg shadow-blue-500/20' : 'bg-slate-50 text-slate-500 hover:bg-slate-100 border-slate-100'" 
+                   class="py-3 rounded-xl border font-black text-[10px] uppercase tracking-wider transition-all cursor-pointer"
+                 >
+                   Diterima (Langsung Tayang)
+                 </button>
+                 <button 
+                   type="button"
+                   @click="updateForm.status = 'EXPIRED'" 
+                   :class="updateForm.status === 'EXPIRED' ? 'bg-amber-600 text-white shadow-lg shadow-amber-500/20' : 'bg-slate-50 text-slate-500 hover:bg-slate-100 border-slate-100'" 
+                   class="py-3 rounded-xl border font-black text-[10px] uppercase tracking-wider transition-all cursor-pointer"
+                 >
+                   Set Kedaluwarsa
+                 </button>
+                 <button 
+                   type="button"
+                   @click="updateForm.status = 'DITOLAK'" 
+                   :class="updateForm.status === 'DITOLAK' ? 'bg-red-600 text-white shadow-lg shadow-red-500/20' : 'bg-slate-50 text-slate-500 hover:bg-slate-100 border-slate-100'" 
+                   class="py-3 rounded-xl border font-black text-[10px] uppercase tracking-wider transition-all cursor-pointer"
+                 >
+                   Ditolak
+                 </button>
+               </div>
+             </div>
 
             <!-- Tampilkan Date Picker HANYA jika status asal materi adalah EXPIRED -->
-            <div v-if="activeSub && activeSub.status === 'EXPIRED' && (updateForm.status === 'DISETUJUI' || updateForm.status === 'TAYANG')" class="space-y-3 p-6 bg-emerald-50 rounded-xl border-2 border-emerald-100 animate-in slide-in-from-top-2 duration-300">
+            <div v-if="activeSub && activeSub.status === 'EXPIRED' && (updateForm.status === 'DISETUJUI' || updateForm.status === 'TAYANG')" class="space-y-2 p-4 bg-emerald-50 rounded-xl border-2 border-emerald-100 animate-in slide-in-from-top-2 duration-300">
                <label class="text-[10px] font-black text-emerald-700 uppercase tracking-widest">Tanggal Mulai Baru</label>
-               <input v-model="updateForm.tanggal_mulai" type="date" class="w-full px-6 py-4 rounded-xl bg-white border-2 border-slate-200 focus:border-emerald-500 outline-none transition-all font-black text-slate-900" required />
+               <input v-model="updateForm.tanggal_mulai" type="date" class="w-full px-4 py-2.5 rounded-xl bg-white border-2 border-slate-200 focus:border-emerald-500 outline-none transition-all font-black text-slate-900" required />
                <p class="text-[9px] font-bold text-emerald-500 uppercase">* Masukkan tanggal mulai baru untuk mengaktifkan kembali materi yang kedaluwarsa.</p>
             </div>
 
             <!-- Conditional File Upload for TAYANG -->
-            <div v-if="updateForm.status === 'TAYANG'" class="space-y-3 p-6 bg-blue-50 rounded-xl border-2 border-blue-100 animate-in slide-in-from-top-2 duration-300">
+            <div v-if="updateForm.status === 'TAYANG'" class="space-y-2 p-4 bg-blue-50 rounded-xl border-2 border-blue-100 animate-in slide-in-from-top-2 duration-300">
                <label class="text-[10px] font-black text-blue-700 uppercase tracking-widest">Dokumentasi Tayang (Wajib)</label>
                <input type="file" @change="handleDocUpload" accept="image/*,video/*" class="w-full text-[10px] font-black file:bg-blue-700 file:text-white file:border-0 file:px-4 file:py-2 file:rounded cursor-pointer" />
                <p class="text-[9px] font-bold text-blue-400 uppercase">* Foto/Video materi saat sudah tampil di videotron.</p>
