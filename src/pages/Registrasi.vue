@@ -297,6 +297,22 @@
                 <div class="space-y-2">
                   <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Mulai Ditayangkan Pada</label>
                   <input v-model="form.tanggal_mulai" type="date" :min="todayDate" autocomplete="off" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-2 border-slate-50 focus:border-blue-700 focus:bg-white outline-none transition-all font-black text-slate-900" required />
+                  <p class="text-[9px] font-bold text-slate-400 uppercase tracking-normal leading-snug mt-1.5 ml-1">
+                    * Pengajuan konten wajib diajukan minimal H-7 (7 hari sebelum) tanggal mulai tayang.
+                  </p>
+                  
+                  <!-- Consequence warning for FORM_STANDARD -->
+                  <div v-if="viewMode === 'FORM_STANDARD' && form.tanggal_mulai" class="mt-2 p-3 rounded-xl border text-[9px] font-black uppercase tracking-wider leading-relaxed" :class="maxDurasiStandard >= 3 ? 'bg-blue-50/50 border-blue-100 text-blue-700' : 'bg-red-50 border-red-100 text-red-600 animate-pulse'">
+                    <span v-if="maxDurasiStandard >= 3">
+                      ✓ Pengajuan tepat waktu (>= 3 hari sebelum tayang). Durasi maksimal 3 hari diperbolehkan.
+                    </span>
+                    <span v-else-if="maxDurasiStandard === 2">
+                      ⚠️ KONSEKUENSI PENGAJUAN H-2: Karena pengajuan mendesak, durasi tayang dibatasi maksimal 2 hari.
+                    </span>
+                    <span v-else>
+                      ⚠️ KONSEKUENSI PENGAJUAN H-1/HARI-H: Karena pengajuan sangat mendesak, durasi tayang dibatasi maksimal 1 hari.
+                    </span>
+                  </div>
                 </div>
 
                 <!-- JIKA CARA DURASI = TANGGAL AKHIR (FORM KHUSUS ONLY) -->
@@ -348,6 +364,9 @@
                 <div class="space-y-2">
                   <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Tanggal Puncak Acara / Event</label>
                   <input v-model="tanggalAcara" type="date" :min="todayDate" autocomplete="off" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-2 border-slate-50 focus:border-blue-700 focus:bg-white outline-none transition-all font-black text-slate-900" required />
+                  <p class="text-[9px] font-bold text-slate-400 uppercase tracking-normal leading-snug mt-1.5 ml-1">
+                    * Pengajuan konten wajib diajukan minimal H-7 (7 hari sebelum) tanggal puncak acara.
+                  </p>
                 </div>
                 
                 <div class="space-y-2 flex flex-col justify-end">
@@ -358,6 +377,9 @@
                     </p>
                     <span class="text-[9px] font-black text-emerald-600 uppercase tracking-wider block">
                       Total: {{ form.durasi }} Hari Tayang (H-2 s.d. Hari-H Acara)
+                    </span>
+                    <span v-if="viewMode === 'FORM_STANDARD' && form.durasi < 3" class="text-[9px] font-black text-rose-600 uppercase tracking-wider block animate-pulse mt-1">
+                      ⚠️ KONSEKUENSI PENGAJUAN MENDESAK: Durasi tayang dipotong menjadi {{ form.durasi }} hari.
                     </span>
                   </div>
                   <div v-else class="p-4 bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl flex items-center justify-center min-h-[70px]">
@@ -662,6 +684,33 @@ const form = reactive({
 })
 
 const caraDurasi = ref('DURASI') // 'DURASI' or 'TANGGAL_AKHIR'
+
+const getDiffDaysFromToday = (dateStr: string): number => {
+  if (!dateStr) return 0
+  const today = new Date()
+  const todayZero = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+  
+  const parts = dateStr.split('-')
+  const targetDate = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10))
+  
+  const diffTime = targetDate.getTime() - todayZero.getTime()
+  return Math.round(diffTime / (1000 * 3600 * 24))
+}
+
+const maxDurasiStandard = computed(() => {
+  if (viewMode.value !== 'FORM_STANDARD') return 30
+  if (!form.tanggal_mulai) return 3
+  const diff = getDiffDaysFromToday(form.tanggal_mulai)
+  if (diff >= 3) return 3
+  if (diff === 2) return 2
+  return 1 // diff <= 1
+})
+
+watch(maxDurasiStandard, (newMax) => {
+  if (viewMode.value === 'FORM_STANDARD' && form.durasi > newMax) {
+    form.durasi = newMax
+  }
+})
 const tanggalAkhir = ref('')
 
 const addDaysLocal = (dateStr: string, days: number): string => {
@@ -725,9 +774,37 @@ const calculateScheduleFromEvent = () => {
     const eventMonth = parseInt(parts[1], 10) - 1
     const eventDay = parseInt(parts[2], 10)
     
-    // Hitung tanggal mulai ideal (H-2 puncak agar total 3 hari tayang: H-2, H-1, Hari-H)
+    // Hitung lead time: eventDate - today
+    const eventDate = new Date(eventYear, eventMonth, eventDay)
+    const today = new Date()
+    const todayZero = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+    const leadTimeDays = Math.round((eventDate.getTime() - todayZero.getTime()) / (1000 * 3600 * 24))
+    
+    // Sesuai aturan konsekuensi untuk FORM_STANDARD:
+    // Jika lead time acara >= 4 hari: mulai H-2 (durasi 3 hari)
+    // Jika lead time acara === 3 hari: mulai H-1 (durasi 2 hari)
+    // Jika lead time acara === 2 hari: mulai H-0 (durasi 1 hari)
+    // Jika lead time acara === 1 hari: mulai H-0 (durasi 1 hari)
+    // Jika lead time acara === 0 hari: mulai H-0 (durasi 1 hari)
+    let offsetDays = 2 // default H-2
+    let maxDur = 3
+    
+    if (viewMode.value === 'FORM_STANDARD') {
+      if (leadTimeDays >= 4) {
+        offsetDays = 2
+        maxDur = 3
+      } else if (leadTimeDays === 3) {
+        offsetDays = 1
+        maxDur = 2
+      } else {
+        // leadTimeDays <= 2
+        offsetDays = 0
+        maxDur = 1
+      }
+    }
+    
     const idealStart = new Date(eventYear, eventMonth, eventDay)
-    idealStart.setDate(idealStart.getDate() - 2)
+    idealStart.setDate(idealStart.getDate() - offsetDays)
     
     const y = idealStart.getFullYear()
     const m = String(idealStart.getMonth() + 1).padStart(2, '0')
@@ -754,8 +831,8 @@ const calculateScheduleFromEvent = () => {
     
     if (diffDays >= 0) {
       let computedDurasi = diffDays + 1
-      if (viewMode.value === 'FORM_STANDARD' && computedDurasi > 3) {
-        computedDurasi = 3
+      if (viewMode.value === 'FORM_STANDARD' && computedDurasi > maxDur) {
+        computedDurasi = maxDur
       }
       form.durasi = computedDurasi
       form.satuan = 'HARI'
@@ -827,9 +904,12 @@ const copySpecialLink = () => {
 }
 
 watch(() => form.durasi, (newVal) => {
-  // Hanya kunci 3 hari jika di FORM_STANDARD (publik)
-  if (viewMode.value === 'FORM_STANDARD' && newVal && Number(newVal) > 3) {
-    form.durasi = 3
+  // Hanya kunci sesuai maxDurasiStandard jika di FORM_STANDARD (publik)
+  if (viewMode.value === 'FORM_STANDARD' && newVal) {
+    const limit = maxDurasiStandard.value
+    if (Number(newVal) > limit) {
+      form.durasi = limit
+    }
   }
   // Kunci 30 hari jika di FORM_SPECIAL (khusus)
   if (viewMode.value === 'FORM_SPECIAL' && newVal && Number(newVal) > 30) {
