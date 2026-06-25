@@ -215,7 +215,7 @@ function getAllSubmissionData() {
             if (status === 'EXPIRED') {
               isExpired = true;
               sisaHari = 0;
-              if (diffTime < -24 * 60 * 60 * 1000) {
+              if (diffTime !== 0) {
                 shouldHideFromPublic = true;
               }
             } else if (status === 'TAYANG' && sisaHari <= 0) {
