@@ -31,38 +31,13 @@
             <div class="aspect-[3/2] bg-black overflow-hidden rounded-sm relative">
               <!-- DYNAMIC MOCKUP: IMAGE OR VIDEO -->
               <template v-if="mockupContent.isVideo">
-                <video 
-                  ref="mockupVideoRef"
+                <iframe 
                   :key="mockupContent.url"
-                  :src="mockupContent.url" 
-                  class="w-full h-full transition-all duration-700 absolute inset-0 z-10"
-                  :class="[
-                    mockupFitMode === 'cover' ? 'object-cover' : 'object-contain',
-                    mockupVideoLoaded ? 'opacity-100' : 'opacity-0'
-                  ]"
-                  muted
-                  :loop="activeGalleryItems.length <= 1"
-                  autoplay
-                  playsinline
-                  webkit-playsinline
-                  preload="auto"
-                  @loadedmetadata="onMockupVideoLoad"
-                  @canplay="onMockupVideoLoad"
-                  @playing="onMockupVideoPlaying"
-                  @ended="advanceSlideshow"
-                  @error="onMockupVideoError"
-                ></video>
-                <!-- Thumbnail Fallback as background (fully visible when loading) -->
-                <img 
-                  :src="getPreviewUrl(mockupContent.url)" 
-                  class="w-full h-full absolute inset-0 z-0 transition-opacity duration-700"
-                  :class="mockupFitMode === 'cover' ? 'object-cover' : 'object-contain'"
-                  alt="Loading Media..."
-                />
-                <!-- Loader spinner visible only when video is not loaded yet -->
-                <div v-if="!mockupVideoLoaded" class="absolute inset-0 flex items-center justify-center bg-slate-950/20 backdrop-blur-[2px] z-20 pointer-events-none">
-                   <div class="w-8 h-8 border-4 border-white/20 border-t-white rounded-full animate-spin"></div>
-                </div>
+                  :src="getIframeUrl(mockupContent.url)" 
+                  class="w-full h-full border-none transition-all duration-1000 absolute inset-0 z-10"
+                  :class="mockupFitMode === 'cover' ? 'object-cover scale-105' : 'object-contain'"
+                  allow="autoplay; encrypted-media"
+                ></iframe>
               </template>
               <img 
                 v-else
@@ -99,22 +74,7 @@
                       </svg>
                     </button>
 
-                    <!-- Mute / Unmute Button (only shown for video) -->
-                    <button 
-                      v-if="mockupContent.isVideo"
-                      @click.stop="toggleMockupMuted"
-                      class="text-white hover:text-blue-400 transition-colors border-l border-white/10 pl-2 focus:outline-none"
-                      :title="mockupMuted ? 'Aktifkan Suara' : 'Matikan Suara'"
-                    >
-                      <!-- Sound Off / Muted -->
-                      <svg v-if="mockupMuted" xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM12.293 7.293a1 1 0 011.414 0L15 8.586l1.293-1.293a1 1 0 111.414 1.414L16.414 10l1.293 1.293a1 1 0 01-1.414 1.414L15 11.414l-1.293 1.293a1 1 0 01-1.414-1.414L13.586 10l-1.293-1.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-                      </svg>
-                      <!-- Sound On -->
-                      <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM18 10a6 6 0 01-8.847 5.303 1 1 0 11.97-1.751A4 4 0 0016 10a4 4 0 00-3.877-3.552 1 1 0 11.97-1.751A6 6 0 0118 10zM14 10a2 2 0 01-3.007 1.73a1 1 0 11.97-1.752A0.001 0.001 0 0012 10c0-.001 0-.002-.001-.003a1 1 0 11.97-1.753A2 2 0 0114 10z" clip-rule="evenodd" />
-                      </svg>
-                    </button>
+
 
                     <!-- Aspect Ratio Toggle Button (Cover / Contain) -->
                     <button 
@@ -503,7 +463,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed, watch, nextTick } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { getGallery, getGroups } from '../api'
 
 const galleryItems = ref<any[]>([])
@@ -512,76 +472,21 @@ const loading = ref(true)
 const currentMockupIndex = ref(0)
 let slideshowTimeout: any = null
 
-const mockupMuted = ref(true)
 const mockupFitMode = ref<'cover' | 'contain'>('cover')
 const isSlideshowPaused = ref(false)
-const mockupVideoRef = ref<HTMLVideoElement | null>(null)
-const mockupVideoLoaded = ref(false)
-
-const toggleMockupMuted = () => {
-  mockupMuted.value = !mockupMuted.value
-  if (mockupVideoRef.value) {
-    mockupVideoRef.value.muted = mockupMuted.value
-  }
-}
 
 const toggleMockupPlay = () => {
   isSlideshowPaused.value = !isSlideshowPaused.value
   if (isSlideshowPaused.value) {
     if (slideshowTimeout) clearTimeout(slideshowTimeout)
-    if (mockupVideoRef.value) mockupVideoRef.value.pause()
   } else {
     setupNextSlideshowTimer()
-    if (mockupVideoRef.value) {
-      mockupVideoRef.value.play().catch(err => console.warn(err))
-    }
   }
 }
 
 const toggleMockupFitMode = () => {
   mockupFitMode.value = mockupFitMode.value === 'cover' ? 'contain' : 'cover'
 }
-
-const onMockupVideoLoad = (e: any) => {
-  const video = e.target
-  if (video) {
-    video.muted = mockupMuted.value
-    // Double check if slideshow is not paused
-    if (!isSlideshowPaused.value) {
-      video.play().then(() => {
-        mockupVideoLoaded.value = true
-      }).catch((err: any) => {
-        console.warn("Programmatic play failed:", err)
-      })
-    }
-  }
-}
-
-const onMockupVideoPlaying = () => {
-  mockupVideoLoaded.value = true
-}
-
-const onMockupVideoError = () => {
-  mockupVideoLoaded.value = false
-}
-
-watch(() => mockupContent.value.url, async () => {
-  mockupVideoLoaded.value = false
-  if (mockupContent.value.isVideo) {
-    await nextTick()
-    if (mockupVideoRef.value) {
-      mockupVideoRef.value.load()
-      mockupVideoRef.value.muted = mockupMuted.value
-      if (!isSlideshowPaused.value) {
-        try {
-          await mockupVideoRef.value.play()
-        } catch (err) {
-          console.warn("Autoplay was prevented or video failed to load:", err)
-        }
-      }
-    }
-  }
-})
 
 const activeAlbum = ref<string[] | null>(null)
 const activeAlbumTitle = ref('')
@@ -731,6 +636,20 @@ const getStreamUrl = (url: string) => {
     if (url.includes('id=')) id = url.split('id=')[1].split('&')[0]
     else if (url.includes('/d/')) id = url.split('/d/')[1].split('/')[0]
     return `https://drive.google.com/uc?id=${id}&export=download`
+  }
+  return url
+}
+
+const getIframeUrl = (url: string) => {
+  if (!url) return ''
+  if (url.includes('drive.google.com')) {
+    let id = ''
+    if (url.includes('id=')) id = url.split('id=')[1].split('&')[0]
+    else if (url.includes('/d/')) id = url.split('/d/')[1].split('/')[0]
+    if (id) {
+      // Mencoba bisukan dengan parameter autoplay=1, mute=1 dan muted=1
+      return `https://drive.google.com/file/d/${id}/preview?autoplay=1&mute=1&muted=1`
+    }
   }
   return url
 }
