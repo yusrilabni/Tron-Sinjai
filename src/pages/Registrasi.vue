@@ -174,15 +174,15 @@
              </div>
           </div>
 
-          <div class="p-8 md:p-16 space-y-16">
+          <div class="p-5 sm:p-8 md:p-12 space-y-8 md:space-y-12">
                 <!-- 01: IDENTITY -->
             <div class="space-y-10">
-              <div class="flex items-center gap-4">
-                 <div class="px-3 py-1 bg-slate-900 text-white text-[10px] font-black italic">01</div>
-                 <h4 class="text-xs font-black text-slate-400 uppercase tracking-[0.3em]">Identitas Pengaju (OPD/Instansi)</h4>
-                 <div class="flex-grow h-px bg-slate-50"></div>
+              <div class="flex items-center gap-3">
+                 <div class="w-8 h-8 rounded-full bg-blue-600/10 text-blue-700 flex items-center justify-center font-black text-xs shrink-0">01</div>
+                 <h4 class="text-xs font-black text-slate-700 uppercase tracking-[0.2em]">Identitas Pengaju (OPD/Instansi)</h4>
+                 <div class="flex-grow h-px bg-slate-100"></div>
               </div>
-              <div class="grid md:grid-cols-2 gap-10">
+              <div class="grid md:grid-cols-2 gap-6 md:gap-8">
                 <div class="space-y-2">
                   <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Instansi / Nama Lembaga</label>
                   <input v-model="form.instansi" type="text" placeholder="Contoh: Dinas Kesehatan" autocomplete="off" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-2 border-slate-50 focus:border-blue-700 focus:bg-white outline-none transition-all font-bold" required />
@@ -204,12 +204,12 @@
 
             <!-- 02: DETAIL MATERI & PUBLIKASI -->
             <div class="space-y-10">
-              <div class="flex items-center gap-4">
-                 <div class="px-3 py-1 bg-slate-900 text-white text-[10px] font-black italic">02</div>
-                 <h4 class="text-xs font-black text-slate-400 uppercase tracking-[0.3em]">Detail Publikasi & Tema</h4>
-                 <div class="flex-grow h-px bg-slate-50"></div>
+              <div class="flex items-center gap-3">
+                 <div class="w-8 h-8 rounded-full bg-blue-600/10 text-blue-700 flex items-center justify-center font-black text-xs shrink-0">02</div>
+                 <h4 class="text-xs font-black text-slate-700 uppercase tracking-[0.2em]">Detail Publikasi & Tema</h4>
+                 <div class="flex-grow h-px bg-slate-100"></div>
               </div>
-              <div class="grid md:grid-cols-2 gap-10">
+              <div class="grid md:grid-cols-2 gap-6 md:gap-8">
                 <div class="space-y-2">
                   <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Judul / Tema Publikasi</label>
                   <input v-model="form.judul" type="text" name="v_judul_iklan" placeholder="Contoh: Himbauan Jaga Kebersihan" autocomplete="new-password" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-2 border-slate-50 focus:border-blue-700 focus:bg-white outline-none transition-all font-bold" required />
@@ -240,10 +240,10 @@
 
             <!-- 03: JADWAL & DURASI TAYANG -->
             <div class="space-y-10">
-              <div class="flex items-center gap-4">
-                 <div class="px-3 py-1 bg-slate-900 text-white text-[10px] font-black italic">03</div>
-                 <h4 class="text-xs font-black text-slate-400 uppercase tracking-[0.3em]">Jadwal & Durasi Tayang</h4>
-                 <div class="flex-grow h-px bg-slate-50"></div>
+              <div class="flex items-center gap-3">
+                 <div class="w-8 h-8 rounded-full bg-blue-600/10 text-blue-700 flex items-center justify-center font-black text-xs shrink-0">03</div>
+                 <h4 class="text-xs font-black text-slate-700 uppercase tracking-[0.2em]">Jadwal & Durasi Tayang</h4>
+                 <div class="flex-grow h-px bg-slate-100"></div>
               </div>
 
               <!-- Pilihan Metode Jadwal (Tab Premium) -->
@@ -293,10 +293,10 @@
               </div>
 
               <!-- JIKA METODE JADWAL = MANUAL -->
-              <div v-if="metodeJadwal === 'MANUAL'" class="grid md:grid-cols-2 gap-10 animate-fade-in">
-                <div class="space-y-2">
-                  <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Mulai Ditayangkan Pada</label>
-                  <input v-model="form.tanggal_mulai" type="date" :min="todayDate" autocomplete="off" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-2 border-slate-50 focus:border-blue-700 focus:bg-white outline-none transition-all font-black text-slate-900" required />
+              <div v-if="metodeJadwal === 'MANUAL'" class="grid md:grid-cols-2 gap-6 md:gap-8 animate-fade-in">
+                 <div class="space-y-2">
+                   <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Mulai Ditayangkan Pada</label>
+                   <input v-model="form.tanggal_mulai" type="date" :min="todayDate" autocomplete="off" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-2 border-slate-50 focus:border-blue-700 focus:bg-white outline-none transition-all font-black text-slate-900" required />
                   
                   <!-- Consequence warning for FORM_STANDARD -->
                   <div v-if="viewMode === 'FORM_STANDARD' && form.tanggal_mulai" class="mt-2 p-3 rounded-xl border text-[9px] font-black uppercase tracking-wider leading-relaxed" :class="maxDurasiStandard >= 3 ? 'bg-blue-50/50 border-blue-100 text-blue-700' : 'bg-red-50 border-red-100 text-red-600 animate-pulse'">
@@ -357,10 +357,10 @@
               </div>
 
               <!-- JIKA METODE JADWAL = ACARA -->
-              <div v-else class="grid md:grid-cols-2 gap-10 animate-fade-in">
-                <div class="space-y-2">
-                  <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Tanggal Puncak Acara / Event</label>
-                  <input v-model="tanggalAcara" type="date" :min="todayDate" autocomplete="off" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-2 border-slate-50 focus:border-blue-700 focus:bg-white outline-none transition-all font-black text-slate-900" required />
+              <div v-else class="grid md:grid-cols-2 gap-6 md:gap-8 animate-fade-in">
+                 <div class="space-y-2">
+                   <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Tanggal Puncak Acara / Event</label>
+                   <input v-model="tanggalAcara" type="date" :min="todayDate" autocomplete="off" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-2 border-slate-50 focus:border-blue-700 focus:bg-white outline-none transition-all font-black text-slate-900" required />
                 </div>
                 
                 <div class="space-y-2 flex flex-col justify-end">
@@ -377,18 +377,19 @@
                     </span>
                   </div>
                   
-                  <div v-else class="p-5 bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl space-y-3 text-[9px] text-slate-400 uppercase tracking-wider font-bold leading-normal">
-                    <div class="text-center font-black text-slate-500 pb-1.5 border-b border-dashed border-slate-200">
-                      💡 TENTUKAN TANGGAL PUNCAK ACARA UNTUK MENGHITUNG JADWAL TAYANG
+                  <div v-else class="p-5 bg-blue-50/50 border-2 border-blue-100/50 rounded-2xl space-y-4 text-left">
+                    <div class="flex items-center gap-2 text-blue-800 border-b border-blue-100 pb-2">
+                      <span class="text-base">💡</span>
+                      <span class="text-[10px] font-black uppercase tracking-wider">Petunjuk Tanggal Puncak Acara</span>
                     </div>
-                    <div class="space-y-2">
+                    <div class="space-y-3 text-[10px] font-bold text-slate-600 leading-normal">
                       <div>
-                        <span class="font-black text-slate-500 block">📅 PENGURANGAN DURASI TAYANG:</span>
-                        Jadwal tayang dikurangi jika pengajuan dikirim mendesak (kurang dari H-7 hari puncak). Hari mulai tayang otomatis bergeser mendekati hari-H acara sehingga durasi berkurang (contoh: pengajuan H-2 hanya mendapat 1 hari tayang).
+                        <span class="font-black text-blue-800 block uppercase tracking-wide mb-1">📅 PENGURANGAN DURASI TAYANG:</span>
+                        Durasi tayang disesuaikan otomatis berdasarkan sisa hari antara tanggal Anda mengunggah (upload) dengan tanggal puncak acara (Minimal H-7). Pengajuan mendesak akan memotong hari mulai tayang secara otomatis.
                       </div>
-                      <div class="pt-1.5 border-t border-slate-200/30">
-                        <span class="font-black text-slate-500 block">🔍 VERIFIKASI TANGGAL KONTEN:</span>
-                        Admin akan memverifikasi kesesuaian tanggal di form dengan tanggal acara di flyer/video. Jika tidak cocok, pengajuan akan ditolak.
+                      <div class="pt-2 border-t border-slate-100">
+                        <span class="font-black text-blue-800 block uppercase tracking-wide mb-1">🔍 VERIFIKASI TANGGAL KONTEN:</span>
+                        Admin akan memverifikasi kesesuaian tanggal di form dengan tanggal acara di flyer/video. Pengajuan akan ditolak jika data tidak cocok.
                       </div>
                     </div>
                   </div>
@@ -398,10 +399,10 @@
 
             <!-- 04: PENGIRIMAN BERKAS & MEDIA -->
             <div class="space-y-10">
-              <div class="flex items-center gap-4">
-                 <div class="px-3 py-1 bg-slate-900 text-white text-[10px] font-black italic">04</div>
-                 <h4 class="text-xs font-black text-slate-400 uppercase tracking-[0.3em]">Unggah Berkas / Media Materi</h4>
-                 <div class="flex-grow h-px bg-slate-50"></div>
+              <div class="flex items-center gap-3">
+                 <div class="w-8 h-8 rounded-full bg-blue-600/10 text-blue-700 flex items-center justify-center font-black text-xs shrink-0">04</div>
+                 <h4 class="text-xs font-black text-slate-700 uppercase tracking-[0.2em]">Unggah Berkas / Media Materi</h4>
+                 <div class="flex-grow h-px bg-slate-100"></div>
               </div>
               
               <div class="space-y-8 max-w-xl">
@@ -621,25 +622,28 @@
 
               </div>
 
-              <!-- Agreement Box -->
-              <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                <label class="flex items-start gap-3 cursor-pointer">
-                  <input v-model="guidelineAgreed" type="checkbox" class="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 shrink-0 mt-0.5 cursor-pointer" />
-                  <span class="text-[10px] font-black text-slate-700 uppercase tracking-tight leading-relaxed">
-                    Saya menyatakan bahwa saya telah membaca, memahami, dan menyetujui seluruh ketentuan format materi di atas.
-                  </span>
-                </label>
+              <!-- Footer (Fixed at bottom) -->
+              <div class="shrink-0 space-y-4 pt-4 border-t border-slate-100 bg-white">
+                <!-- Agreement Box -->
+                <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                  <label class="flex items-start gap-3 cursor-pointer">
+                    <input v-model="guidelineAgreed" type="checkbox" class="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 shrink-0 mt-0.5 cursor-pointer" />
+                    <span class="text-[10px] font-black text-slate-700 uppercase tracking-tight leading-relaxed">
+                      Saya menyatakan bahwa saya telah membaca, memahami, dan menyetujui seluruh ketentuan format materi di atas.
+                    </span>
+                  </label>
+                </div>
+                
+                <!-- Action Button -->
+                <button 
+                  @click="showGuidelineModal = false"
+                  :disabled="!guidelineAgreed"
+                  :class="guidelineAgreed ? 'bg-slate-900 hover:bg-slate-800 shadow-lg cursor-pointer' : 'bg-slate-200 text-slate-400 cursor-not-allowed'"
+                  class="w-full py-4 text-white rounded-xl font-black text-xs uppercase tracking-widest transition-all"
+                >
+                  Saya Mengerti & Lanjutkan
+                </button>
               </div>
-
-              <!-- Action Button -->
-              <button 
-                @click="showGuidelineModal = false"
-                :disabled="!guidelineAgreed"
-                :class="guidelineAgreed ? 'bg-slate-900 hover:bg-slate-800 shadow-lg cursor-pointer' : 'bg-slate-200 text-slate-400 cursor-not-allowed'"
-                class="w-full py-5 text-white rounded-xl font-black text-xs uppercase tracking-widest transition-all"
-              >
-                Saya Mengerti & Lanjutkan
-              </button>
             </div>
           </div>
         </transition>
@@ -664,11 +668,40 @@ const route = useRoute()
 const showGuidelineModal = ref(false)
 const guidelineAgreed = ref(false)
 
+const updatePageTitleAndMeta = (newMode: string) => {
+  let title = "Portal Videotron Sinjai - Layanan Pengajuan Penayangan"
+  let description = "Ajukan materi publikasi, iklan, dan informasi Anda untuk ditayangkan di Videotron Kabupaten Sinjai dengan cepat, mudah, dan transparan."
+
+  if (newMode === 'FORM_STANDARD') {
+    title = "Layanan Umum (Maks 3 Hari) - Portal Videotron Sinjai"
+    description = "Ajukan materi publikasi atau iklan umum untuk ditayangkan di Videotron Kabupaten Sinjai (Maksimal 3 Hari)."
+  } else if (newMode === 'FORM_SPECIAL') {
+    title = "Layanan Internal & Prioritas (Maks 30 Hari) - Portal Videotron Sinjai"
+    description = "Layanan khusus OPD, instansi pemerintah, dan agenda prioritas Kabupaten Sinjai dengan durasi tayang bebas (Maksimal 30 Hari)."
+  }
+
+  document.title = title
+
+  // Update meta elements dynamically in client DOM
+  const selectors = {
+    'meta[property="og:title"]': title,
+    'meta[name="twitter:title"]': title,
+    'meta[property="og:description"]': description,
+    'meta[name="twitter:description"]': description,
+  }
+
+  for (const [selector, value] of Object.entries(selectors)) {
+    const el = document.querySelector(selector)
+    if (el) el.setAttribute('content', value)
+  }
+}
+
 watch(viewMode, (newMode) => {
   if (newMode === 'FORM_STANDARD' || newMode === 'FORM_SPECIAL') {
     showGuidelineModal.value = true
     guidelineAgreed.value = false
   }
+  updatePageTitleAndMeta(newMode)
 })
 
 const isSubmitting = ref(false)
@@ -1148,6 +1181,7 @@ onMounted(() => {
     fetchInitialData()
   }
   checkRoutePath(window.location.pathname)
+  updatePageTitleAndMeta(viewMode.value)
 })
 </script>
 
