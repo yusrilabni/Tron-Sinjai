@@ -645,8 +645,8 @@ const selectInternal = () => {
   if (isAdmin.value) {
     viewMode.value = 'CHOOSE_INTERNAL_TYPE'
   } else {
-    // Jika bukan admin, bypass ke form standard
-    viewMode.value = 'FORM_STANDARD'
+    // Jika bukan admin, bypass ke form standar dengan rute yang benar
+    router.push('/registrasi-standar')
   }
 }
 
@@ -660,7 +660,7 @@ const selectForm = (mode: 'FORM_STANDARD' | 'FORM_SPECIAL') => {
   if (mode === 'FORM_SPECIAL') {
     router.push('/registrasi-internal')
   } else {
-    router.push('/registrasi')
+    router.push('/registrasi-standar')
   }
 }
 
@@ -872,8 +872,15 @@ const checkRoutePath = (path: string) => {
     viewMode.value = 'FORM_SPECIAL'
     showGuidelineModal.value = true
     guidelineAgreed.value = false
+  } else if (
+    path === '/registrasi-standar' ||
+    path.endsWith('/registrasi-standar')
+  ) {
+    viewMode.value = 'FORM_STANDARD'
+    showGuidelineModal.value = true
+    guidelineAgreed.value = false
   } else {
-    if (viewMode.value === 'FORM_SPECIAL') {
+    if (viewMode.value === 'FORM_SPECIAL' || viewMode.value === 'FORM_STANDARD') {
       viewMode.value = isAdmin.value ? 'CHOOSE_INTERNAL_TYPE' : 'CHOOSE_CATEGORY'
     }
   }

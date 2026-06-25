@@ -15,6 +15,7 @@ const routes = [
     children: [
       { path: '', name: 'home', component: Home },
       { path: 'registrasi', name: 'registrasi', component: Registrasi },
+      { path: 'registrasi-standar', name: 'registrasi-standar', component: Registrasi },
       { path: 'registrasi-internal', name: 'registrasi-internal', component: Registrasi },
       { path: 'status', name: 'status', component: Status },
       { path: 'logs', name: 'logs', component: Logs },
