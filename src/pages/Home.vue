@@ -32,17 +32,27 @@
               <!-- DYNAMIC MOCKUP: IMAGE OR VIDEO -->
               <template v-if="mockupContent.isVideo">
                 <video 
+                  ref="mockupVideoRef"
                   :key="mockupContent.url"
                   :src="mockupContent.url" 
-                  class="w-full h-full transition-all duration-1000"
+                  class="w-full h-full transition-all duration-1000 absolute inset-0 z-10"
                   :class="mockupFitMode === 'cover' ? 'object-cover' : 'object-contain'"
-                  :muted="mockupMuted"
+                  muted
                   :loop="activeGalleryItems.length <= 1"
                   autoplay
                   playsinline
                   webkit-playsinline
+                  preload="auto"
+                  @loadedmetadata="onMockupVideoLoad"
+                  @canplay="onMockupVideoLoad"
                   @ended="advanceSlideshow"
                 ></video>
+                <!-- Thumbnail Fallback as background while video is loading/buffering -->
+                <img 
+                  :src="getPreviewUrl(mockupContent.url)" 
+                  class="w-full h-full object-cover absolute inset-0 z-0 opacity-40 grayscale"
+                  alt="Loading Video..."
+                />
               </template>
               <img 
                 v-else
@@ -483,7 +493,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed, watch, nextTick } from 'vue'
 import { getGallery, getGroups } from '../api'
 
 const galleryItems = ref<any[]>([])
@@ -495,23 +505,61 @@ let slideshowTimeout: any = null
 const mockupMuted = ref(true)
 const mockupFitMode = ref<'cover' | 'contain'>('cover')
 const isSlideshowPaused = ref(false)
+const mockupVideoRef = ref<HTMLVideoElement | null>(null)
 
 const toggleMockupMuted = () => {
   mockupMuted.value = !mockupMuted.value
+  if (mockupVideoRef.value) {
+    mockupVideoRef.value.muted = mockupMuted.value
+  }
 }
 
 const toggleMockupPlay = () => {
   isSlideshowPaused.value = !isSlideshowPaused.value
   if (isSlideshowPaused.value) {
     if (slideshowTimeout) clearTimeout(slideshowTimeout)
+    if (mockupVideoRef.value) mockupVideoRef.value.pause()
   } else {
     setupNextSlideshowTimer()
+    if (mockupVideoRef.value) {
+      mockupVideoRef.value.play().catch(err => console.warn(err))
+    }
   }
 }
 
 const toggleMockupFitMode = () => {
   mockupFitMode.value = mockupFitMode.value === 'cover' ? 'contain' : 'cover'
 }
+
+const onMockupVideoLoad = (e: any) => {
+  const video = e.target
+  if (video) {
+    video.muted = mockupMuted.value
+    // Double check if slideshow is not paused
+    if (!isSlideshowPaused.value) {
+      video.play().catch((err: any) => {
+        console.warn("Programmatic play failed:", err)
+      })
+    }
+  }
+}
+
+watch(() => mockupContent.value.url, async () => {
+  if (mockupContent.value.isVideo) {
+    await nextTick()
+    if (mockupVideoRef.value) {
+      mockupVideoRef.value.load()
+      mockupVideoRef.value.muted = mockupMuted.value
+      if (!isSlideshowPaused.value) {
+        try {
+          await mockupVideoRef.value.play()
+        } catch (err) {
+          console.warn("Autoplay was prevented or video failed to load:", err)
+        }
+      }
+    }
+  }
+})
 
 const activeAlbum = ref<string[] | null>(null)
 const activeAlbumTitle = ref('')
