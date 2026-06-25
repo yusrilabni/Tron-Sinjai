@@ -298,18 +298,7 @@
                    <label class="text-xs sm:text-sm font-black text-slate-700 uppercase tracking-wider ml-1">Mulai Ditayangkan Pada</label>
                    <input v-model="form.tanggal_mulai" type="date" :min="todayDate" autocomplete="off" class="w-full px-4 py-3 sm:px-5 sm:py-3.5 rounded-xl bg-white border-2 border-slate-200 focus:border-blue-700 focus:ring-4 focus:ring-blue-700/5 outline-none transition-all font-black text-slate-900" required />
                   
-                  <!-- Consequence warning for FORM_STANDARD -->
-                  <div v-if="viewMode === 'FORM_STANDARD' && form.tanggal_mulai" class="mt-2 p-3.5 rounded-xl border-2 text-[10px] sm:text-xs font-black uppercase tracking-wider leading-relaxed" :class="maxDurasiStandard >= 3 ? 'bg-emerald-50 border-emerald-100 text-emerald-800' : 'bg-red-50 border-red-100 text-red-700 animate-pulse'">
-                    <span v-if="maxDurasiStandard >= 3">
-                      ✓ Pengajuan tepat waktu (>= 3 hari sebelum tayang). Durasi maksimal 3 hari diperbolehkan.
-                    </span>
-                    <span v-else-if="maxDurasiStandard === 2">
-                      ⚠️ KONSEKUENSI PENGAJUAN MENDESAK (H-2 atau H-1): Karena pengajuan mendesak, durasi tayang dibatasi maksimal 2 hari.
-                    </span>
-                    <span v-else>
-                      ⚠️ KONSEKUENSI PENGAJUAN SANGAT MENDESAK (Hari-H): Karena pengajuan pada hari penayangan, durasi tayang dibatasi maksimal 1 hari.
-                    </span>
-                  </div>
+                  <!-- Consequence warning removed -->
                 </div>
 
                 <!-- JIKA CARA DURASI = TANGGAL AKHIR (FORM KHUSUS ONLY) -->
@@ -714,7 +703,7 @@ const todayDate = new Date().toISOString().split('T')[0]
 const uploadType = ref('FILE')
 const linkUrl = ref('')
 
-const metodeJadwal = ref<'MANUAL' | 'ACARA'>('MANUAL')
+const metodeJadwal = ref<'MANUAL' | 'ACARA'>('ACARA')
 const tanggalAcara = ref('')
 
 const form = reactive({
@@ -739,6 +728,7 @@ const getDiffDaysFromToday = (dateStr: string): number => {
 
 const maxDurasiStandard = computed(() => {
   if (viewMode.value !== 'FORM_STANDARD') return 30
+  if (metodeJadwal.value === 'MANUAL') return 3
   if (!form.tanggal_mulai) return 3
   const diff = getDiffDaysFromToday(form.tanggal_mulai)
   if (diff >= 3) return 3
