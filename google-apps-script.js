@@ -409,7 +409,11 @@ function handleAssembleFile(payload) {
     const decoded = Utilities.base64Decode(combinedBase64);
     const blob = Utilities.newBlob(decoded, payload.mimeType, payload.fileName);
     const file = folder.createFile(blob);
-    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    try {
+      file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    } catch (sharingErr) {
+      console.warn("Gagal menyetel sharing link (batasan Google Workspace): " + sharingErr.toString());
+    }
     return response({ success: true, fileUrl: file.getUrl() });
   } catch (err) {
     return response({ success: false, message: "Assembly Error: " + err.toString() });
@@ -531,7 +535,11 @@ function uploadToDrive(base64, name, type) {
     const data = Utilities.base64Decode(base64.split(',')[1]);
     const blob = Utilities.newBlob(data, type, name);
     const file = folder.createFile(blob);
-    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    try {
+      file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    } catch (sharingErr) {
+      console.warn("Gagal menyetel sharing link (batasan Google Workspace): " + sharingErr.toString());
+    }
     return file.getUrl();
   } catch(e) { throw new Error("Drive Upload: " + e.toString()); }
 }
