@@ -10,9 +10,9 @@ const api = axios.create({
 })
 
 const handleApiResponse = (data: any, action?: string) => {
-  if (data && data.success === false && data.message && (data.message.includes('Akses ditolak') || data.message.includes('tidak sah'))) {
+  if (data && data.success === false && data.message && (data.message === 'Akses ditolak: Sesi Anda telah berakhir atau tidak sah.' || data.message.includes('Sesi Anda telah berakhir'))) {
     console.warn(`[API] Session expired or access denied on action: ${action || 'unknown'}, logging out...`);
-    alert(`[Sesi Berakhir / Akses Ditolak]\nAksi: ${action || 'unknown'}\nPesan Server: ${data.message}`);
+    alert(`[Sesi Berakhir]\nAksi: ${action || 'unknown'}\nPesan Server: ${data.message}`);
     localStorage.removeItem('admin_token')
     localStorage.removeItem('admin_user')
     window.location.href = '/login?expired=1'
