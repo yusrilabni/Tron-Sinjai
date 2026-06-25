@@ -243,8 +243,11 @@
                     <span v-if="form.tanggal_mulai && tanggalAkhir && form.durasi > 0" class="text-[8px] font-black text-blue-700 bg-blue-50 px-2.5 py-1 rounded uppercase tracking-wider border border-blue-100">
                       {{ form.durasi }} Hari Tayang
                     </span>
+                    <span v-if="!form.tanggal_mulai" class="text-[8px] font-black text-amber-600 bg-amber-50 px-2.5 py-1 rounded uppercase tracking-wider border border-amber-100 animate-pulse">
+                      ⚠️ Pilih tanggal mulai dahulu
+                    </span>
                   </div>
-                  <input v-model="tanggalAkhir" type="date" :min="form.tanggal_mulai || todayDate" :max="maxTanggalAkhir" autocomplete="off" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-2 border-slate-50 focus:border-blue-700 focus:bg-white outline-none transition-all font-black text-slate-900" required />
+                  <input v-model="tanggalAkhir" type="date" :min="form.tanggal_mulai || todayDate" :max="maxTanggalAkhir" :disabled="!form.tanggal_mulai" autocomplete="off" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-2 border-slate-50 focus:border-blue-700 focus:bg-white outline-none transition-all font-black text-slate-900 disabled:opacity-50 disabled:cursor-not-allowed" required />
                 </div>
 
                 <!-- DURASI BIASA -->
@@ -581,24 +584,40 @@ const form = reactive({
 const caraDurasi = ref('DURASI') // 'DURASI' or 'TANGGAL_AKHIR'
 const tanggalAkhir = ref('')
 
+const addDaysLocal = (dateStr: string, days: number): string => {
+  const parts = dateStr.split('-')
+  const year = parseInt(parts[0], 10)
+  const month = parseInt(parts[1], 10) - 1 // 0-indexed
+  const day = parseInt(parts[2], 10)
+  
+  const date = new Date(year, month, day)
+  date.setDate(date.getDate() + days)
+  
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, '0')
+  const d = String(date.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
+}
+
 const maxTanggalAkhir = computed(() => {
   if (!form.tanggal_mulai) return ''
-  const start = new Date(form.tanggal_mulai)
-  start.setDate(start.getDate() + 30) // batas maksimal 30 hari
-  return start.toISOString().split('T')[0]
+  return addDaysLocal(form.tanggal_mulai, 30)
 })
 
 const calculateDurationFromDates = () => {
   if (caraDurasi.value === 'TANGGAL_AKHIR' && form.tanggal_mulai && tanggalAkhir.value) {
-    const start = new Date(form.tanggal_mulai)
-    const end = new Date(tanggalAkhir.value)
+    const parseLocalDate = (dateStr: string) => {
+      const parts = dateStr.split('-')
+      return new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10))
+    }
+    const start = parseLocalDate(form.tanggal_mulai)
+    const end = parseLocalDate(tanggalAkhir.value)
     const diffTime = end.getTime() - start.getTime()
-    const diffDays = Math.ceil(diffTime / (1000 * 3600 * 24))
+    const diffDays = Math.round(diffTime / (1000 * 3600 * 24))
+    
     if (diffDays > 30) {
       alert('⚠️ Durasi penayangan Formulir Khusus maksimal 30 hari!')
-      const maxD = new Date(form.tanggal_mulai)
-      maxD.setDate(maxD.getDate() + 30)
-      tanggalAkhir.value = maxD.toISOString().split('T')[0]
+      tanggalAkhir.value = addDaysLocal(form.tanggal_mulai, 30)
       form.durasi = 30
       form.satuan = 'HARI'
     } else if (diffDays > 0) {
