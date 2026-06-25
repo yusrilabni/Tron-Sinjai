@@ -230,7 +230,6 @@
                   🏁 Hingga Tanggal Akhir
                 </button>
               </div>
-
               <div class="grid md:grid-cols-2 gap-10">
                 <div class="space-y-2">
                   <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Mulai Ditayangkan Pada</label>
@@ -245,35 +244,30 @@
                       {{ form.durasi }} Hari Tayang
                     </span>
                   </div>
-                  <input v-model="tanggalAkhir" type="date" :min="form.tanggal_mulai || todayDate" autocomplete="off" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-2 border-slate-50 focus:border-blue-700 focus:bg-white outline-none transition-all font-black text-slate-900" required />
+                  <input v-model="tanggalAkhir" type="date" :min="form.tanggal_mulai || todayDate" :max="maxTanggalAkhir" autocomplete="off" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-2 border-slate-50 focus:border-blue-700 focus:bg-white outline-none transition-all font-black text-slate-900" required />
                 </div>
 
-                <!-- DURASI BIASA (HARI / MINGGU / BULAN / TAHUN / SELAMANYA) -->
+                <!-- DURASI BIASA -->
                 <div v-else class="space-y-2">
                   <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
-                    {{ viewMode === 'FORM_STANDARD' ? 'Durasi Penayangan (Maks 3 Hari)' : 'Durasi Penayangan' }}
+                    {{ viewMode === 'FORM_STANDARD' ? 'Durasi Penayangan (Maks 3 Hari)' : 'Durasi Penayangan (Maks 30 Hari)' }}
                   </label>
                   <div class="flex gap-2">
                     <input 
                       v-model="form.durasi" 
                       type="number" 
                       min="1" 
-                      :max="viewMode === 'FORM_STANDARD' ? 3 : 99" 
+                      :max="viewMode === 'FORM_STANDARD' ? 3 : 30" 
                       autocomplete="off" 
                       class="flex-grow px-6 py-4 rounded-xl bg-slate-50 border-2 border-slate-50 focus:border-blue-700 focus:bg-white outline-none transition-all font-black text-slate-900" 
                       required 
                     />
                     
-                    <!-- Pilihan satuan durasi jika Form Khusus -->
-                    <select v-if="viewMode === 'FORM_SPECIAL'" v-model="form.satuan" class="w-36 px-4 rounded-xl bg-blue-50 border-2 border-blue-100 font-black text-[9px] uppercase tracking-widest outline-none text-blue-800">
-                      <option value="HARI">Hari</option>
-                      <option value="MINGGU">Minggu</option>
-                      <option value="BULAN">Bulan</option>
-                      <option value="TAHUN">Tahun</option>
-                      <option value="SELAMANYA">Selamanya</option>
-                    </select>
-                    <!-- Satuan terkunci "Hari" jika Form Standard -->
-                    <div v-else class="px-6 py-4 rounded-xl bg-amber-50 border-2 border-amber-100 font-black text-[9px] uppercase tracking-widest flex items-center text-amber-800">
+                    <!-- Satuan terkunci "Hari" -->
+                    <div 
+                      :class="viewMode === 'FORM_SPECIAL' ? 'bg-blue-50 border-blue-100 text-blue-800' : 'bg-amber-50 border-amber-100 text-amber-800'"
+                      class="px-6 py-4 rounded-xl border-2 font-black text-[9px] uppercase tracking-widest flex items-center"
+                    >
                       Hari
                     </div>
                   </div>
@@ -551,7 +545,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, watch } from 'vue'
+import { ref, reactive, onMounted, watch, computed } from 'vue'
 import { getSettings, post } from '../api'
 
 const viewMode = ref<'CHOOSE_CATEGORY' | 'CHOOSE_INTERNAL_TYPE' | 'FORM_STANDARD' | 'FORM_SPECIAL'>('CHOOSE_CATEGORY')
@@ -587,13 +581,27 @@ const form = reactive({
 const caraDurasi = ref('DURASI') // 'DURASI' or 'TANGGAL_AKHIR'
 const tanggalAkhir = ref('')
 
+const maxTanggalAkhir = computed(() => {
+  if (!form.tanggal_mulai) return ''
+  const start = new Date(form.tanggal_mulai)
+  start.setDate(start.getDate() + 30) // batas maksimal 30 hari
+  return start.toISOString().split('T')[0]
+})
+
 const calculateDurationFromDates = () => {
   if (caraDurasi.value === 'TANGGAL_AKHIR' && form.tanggal_mulai && tanggalAkhir.value) {
     const start = new Date(form.tanggal_mulai)
     const end = new Date(tanggalAkhir.value)
     const diffTime = end.getTime() - start.getTime()
     const diffDays = Math.ceil(diffTime / (1000 * 3600 * 24))
-    if (diffDays > 0) {
+    if (diffDays > 30) {
+      alert('⚠️ Durasi penayangan Formulir Khusus maksimal 30 hari!')
+      const maxD = new Date(form.tanggal_mulai)
+      maxD.setDate(maxD.getDate() + 30)
+      tanggalAkhir.value = maxD.toISOString().split('T')[0]
+      form.durasi = 30
+      form.satuan = 'HARI'
+    } else if (diffDays > 0) {
       form.durasi = diffDays
       form.satuan = 'HARI'
     } else {
@@ -638,13 +646,17 @@ const goBack = () => {
 const copySpecialLink = () => {
   const link = `${window.location.origin}/registrasi?special=1`
   navigator.clipboard.writeText(link)
-  alert('🔗 Link khusus berhasil disalin! Bagikan link ini ke instansi yang membutuhkan agar dapat mendaftar dengan durasi bebas.')
+  alert('🔗 Link khusus berhasil disalin! Bagikan link ini ke instansi yang membutuhkan agar dapat mendaftar dengan durasi maksimal 30 hari.')
 }
 
 watch(() => form.durasi, (newVal) => {
   // Hanya kunci 3 hari jika di FORM_STANDARD (publik)
   if (viewMode.value === 'FORM_STANDARD' && newVal && Number(newVal) > 3) {
     form.durasi = 3
+  }
+  // Kunci 30 hari jika di FORM_SPECIAL (khusus)
+  if (viewMode.value === 'FORM_SPECIAL' && newVal && Number(newVal) > 30) {
+    form.durasi = 30
   }
 })
 
@@ -721,9 +733,24 @@ const uploadInChunks = async (file: File, onProgress: (pct: number) => void): Pr
 
 const handlePreSubmit = () => {
   if (!form.tanggal_mulai) return alert('Pilih tanggal mulai tayang.')
-  if (viewMode.value === 'FORM_SPECIAL' && caraDurasi.value === 'TANGGAL_AKHIR') {
-    if (!tanggalAkhir.value) return alert('Pilih tanggal akhir tayang.')
-    if (form.durasi <= 0) return alert('Tanggal akhir tayang harus setelah tanggal mulai tayang.')
+  if (viewMode.value === 'FORM_SPECIAL') {
+    if (caraDurasi.value === 'TANGGAL_AKHIR') {
+      if (!tanggalAkhir.value) return alert('Pilih tanggal akhir tayang.')
+      calculateDurationFromDates()
+    }
+    if (form.durasi > 30) {
+      return alert('⚠️ Durasi penayangan Formulir Khusus maksimal 30 hari!')
+    }
+    if (form.durasi <= 0) {
+      return alert('⚠️ Durasi penayangan tidak valid (harus minimal 1 hari).')
+    }
+  } else if (viewMode.value === 'FORM_STANDARD') {
+    if (form.durasi > 3) {
+      return alert('⚠️ Durasi penayangan Formulir Standard maksimal 3 hari!')
+    }
+    if (form.durasi <= 0) {
+      return alert('⚠️ Durasi penayangan tidak valid (harus minimal 1 hari).')
+    }
   }
   const today = new Date(); const start = new Date(form.tanggal_mulai)
   const diffDays = Math.ceil((start.getTime() - today.getTime()) / (1000 * 3600 * 24))
