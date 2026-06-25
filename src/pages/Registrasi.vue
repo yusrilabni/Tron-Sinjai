@@ -298,7 +298,7 @@
                   <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Mulai Ditayangkan Pada</label>
                   <input v-model="form.tanggal_mulai" type="date" :min="todayDate" autocomplete="off" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-2 border-slate-50 focus:border-blue-700 focus:bg-white outline-none transition-all font-black text-slate-900" required />
                   <p class="text-[9px] font-bold text-slate-400 uppercase tracking-normal leading-snug mt-1.5 ml-1">
-                    * Pengajuan konten wajib diajukan minimal H-7 (7 hari sebelum) tanggal mulai tayang.
+                    * Konten wajib diajukan minimal H-7 (7 hari sebelum) rencana tanggal mulai ditayangkan.
                   </p>
                   
                   <!-- Consequence warning for FORM_STANDARD -->
@@ -365,7 +365,7 @@
                   <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Tanggal Puncak Acara / Event</label>
                   <input v-model="tanggalAcara" type="date" :min="todayDate" autocomplete="off" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-2 border-slate-50 focus:border-blue-700 focus:bg-white outline-none transition-all font-black text-slate-900" required />
                   <p class="text-[9px] font-bold text-slate-400 uppercase tracking-normal leading-snug mt-1.5 ml-1">
-                    * Pengajuan konten wajib diajukan minimal H-7 (7 hari sebelum) tanggal puncak acara.
+                    * Konten wajib diajukan minimal H-7 (7 hari sebelum) rencana tanggal pelaksanaan puncak acara.
                   </p>
                 </div>
                 
