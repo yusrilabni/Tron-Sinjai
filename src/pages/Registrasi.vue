@@ -175,8 +175,7 @@
           </div>
 
           <div class="p-8 md:p-16 space-y-16">
-            
-            <!-- 01: IDENTITY -->
+                <!-- 01: IDENTITY -->
             <div class="space-y-10">
               <div class="flex items-center gap-4">
                  <div class="px-3 py-1 bg-slate-900 text-white text-[10px] font-black italic">01</div>
@@ -203,16 +202,78 @@
               </div>
             </div>
 
-            <!-- 02: SCHEDULING (DURASI & RENTANG TANGGAL) -->
+            <!-- 02: DETAIL MATERI & PUBLIKASI -->
             <div class="space-y-10">
               <div class="flex items-center gap-4">
                  <div class="px-3 py-1 bg-slate-900 text-white text-[10px] font-black italic">02</div>
+                 <h4 class="text-xs font-black text-slate-400 uppercase tracking-[0.3em]">Detail Publikasi & Tema</h4>
+                 <div class="flex-grow h-px bg-slate-50"></div>
+              </div>
+              <div class="grid md:grid-cols-2 gap-10">
+                <div class="space-y-2">
+                  <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Judul / Tema Publikasi</label>
+                  <input v-model="form.judul" type="text" name="v_judul_iklan" placeholder="Contoh: Himbauan Jaga Kebersihan" autocomplete="new-password" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-2 border-slate-50 focus:border-blue-700 focus:bg-white outline-none transition-all font-bold" required />
+                </div>
+                <div class="space-y-2">
+                  <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Kategori Publikasi</label>
+                  <select v-model="form.kategori" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-2 border-slate-50 focus:border-blue-700 focus:bg-white outline-none transition-all font-bold text-slate-900" required>
+                    <option value="">Pilih Kategori...</option>
+                    <option value="Pembangunan">Pembangunan Daerah</option>
+                    <option value="Himbauan">Himbauan Masyarakat</option>
+                    <option value="Pemerintahan">Info Pemerintahan</option>
+                    <option value="Layanan Masyarakat">Layanan Masyarakat</option>
+                    <option value="Agenda Pemkab">Agenda / Event Pemkab</option>
+                    <option value="Peringatan Hari Besar">HUT / Peringatan Hari Besar</option>
+                    <option value="Prestasi Daerah">Prestasi / Penghargaan</option>
+                    <option value="Pengumuman Resmi">Pengumuman Resmi</option>
+                    <option value="Lainnya">Lainnya (Kustom)...</option>
+                  </select>
+                </div>
+              </div>
+              
+              <!-- Custom Category Text Input -->
+              <div v-if="form.kategori === 'Lainnya'" class="space-y-2 animate-fade-in">
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Kategori Kustom Anda</label>
+                <input v-model="form.kategori_kustom" type="text" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-2 border-slate-50 focus:border-blue-700 focus:bg-white outline-none transition-all font-bold text-slate-900" placeholder="Ketik kategori kustom..." required />
+              </div>
+            </div>
+
+            <!-- 03: JADWAL & DURASI TAYANG -->
+            <div class="space-y-10">
+              <div class="flex items-center gap-4">
+                 <div class="px-3 py-1 bg-slate-900 text-white text-[10px] font-black italic">03</div>
                  <h4 class="text-xs font-black text-slate-400 uppercase tracking-[0.3em]">Jadwal & Durasi Tayang</h4>
                  <div class="flex-grow h-px bg-slate-50"></div>
               </div>
 
-              <!-- PILIHAN CARA INPUT DURASI (HANYA UNTUK FORM KHUSUS / BEBAS) -->
-              <div v-if="viewMode === 'FORM_SPECIAL'" class="flex gap-3 p-1.5 bg-slate-100 rounded-2xl max-w-md">
+              <!-- Pilihan Metode Jadwal (Tab Premium) -->
+              <div class="space-y-4">
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 block">Metode Penentuan Jadwal Tayang</label>
+                <div class="flex flex-col sm:flex-row gap-3 p-1.5 bg-slate-100 rounded-2xl max-w-xl">
+                  <button 
+                    type="button" 
+                    @click="metodeJadwal = 'MANUAL'"
+                    :class="metodeJadwal === 'MANUAL' ? 'bg-white text-blue-700 shadow-md border-blue-100' : 'text-slate-500 hover:text-slate-900 border-transparent'"
+                    class="flex-1 py-3 text-[10px] font-black uppercase tracking-wider rounded-xl border-2 transition-all cursor-pointer text-center"
+                  >
+                    🗓️ Atur Durasi Biasa
+                  </button>
+                  <button 
+                    type="button" 
+                    @click="metodeJadwal = 'ACARA'"
+                    :class="metodeJadwal === 'ACARA' ? 'bg-white text-blue-700 shadow-md border-blue-100' : 'text-slate-500 hover:text-slate-900 border-transparent'"
+                    class="flex-1 py-3 text-[10px] font-black uppercase tracking-wider rounded-xl border-2 transition-all cursor-pointer text-center"
+                  >
+                    🏆 Berdasarkan Hari Puncak Acara
+                  </button>
+                </div>
+                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-normal leading-relaxed ml-1">
+                  {{ metodeJadwal === 'MANUAL' ? '* Anda menentukan tanggal mulai tayang dan durasi hari tayang secara manual.' : '* Sistem akan otomatis menjadwalkan tayang mulai H-3 sebelum puncak acara hingga hari H acara selesai.' }}
+                </p>
+              </div>
+
+              <!-- PILIHAN CARA INPUT DURASI (HANYA MUNCUL DI METODE MANUAL & HANYA UNTUK FORM KHUSUS) -->
+              <div v-if="metodeJadwal === 'MANUAL' && viewMode === 'FORM_SPECIAL'" class="flex gap-3 p-1.5 bg-slate-100 rounded-2xl max-w-md">
                 <button 
                   type="button" 
                   @click="caraDurasi = 'DURASI'"
@@ -230,13 +291,12 @@
                   🏁 Hingga Tanggal Akhir
                 </button>
               </div>
-              <div class="grid md:grid-cols-2 gap-10">
+
+              <!-- JIKA METODE JADWAL = MANUAL -->
+              <div v-if="metodeJadwal === 'MANUAL'" class="grid md:grid-cols-2 gap-10 animate-fade-in">
                 <div class="space-y-2">
                   <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Mulai Ditayangkan Pada</label>
                   <input v-model="form.tanggal_mulai" type="date" :min="todayDate" autocomplete="off" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-2 border-slate-50 focus:border-blue-700 focus:bg-white outline-none transition-all font-black text-slate-900" required />
-                  <p class="text-[10px] font-bold text-red-500 uppercase tracking-normal leading-snug mt-1.5">
-                    * Wajib diajukan minimal H-7 (7 hari sebelum) target tanggal penayangan.
-                  </p>
                 </div>
 
                 <!-- JIKA CARA DURASI = TANGGAL AKHIR (FORM KHUSUS ONLY) -->
@@ -282,79 +342,75 @@
                   </div>
                 </div>
               </div>
+
+              <!-- JIKA METODE JADWAL = ACARA -->
+              <div v-else class="grid md:grid-cols-2 gap-10 animate-fade-in">
+                <div class="space-y-2">
+                  <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Tanggal Puncak Acara / Event</label>
+                  <input v-model="tanggalAcara" type="date" :min="todayDate" autocomplete="off" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-2 border-slate-50 focus:border-blue-700 focus:bg-white outline-none transition-all font-black text-slate-900" required />
+                </div>
+                
+                <div class="space-y-2 flex flex-col justify-end">
+                  <div v-if="tanggalAcara && form.durasi > 0" class="p-4 bg-emerald-50 border-2 border-emerald-100/50 rounded-2xl space-y-1">
+                    <span class="text-[9px] font-black text-emerald-700 uppercase tracking-widest block">📅 RENCANA JADWAL TAYANG OTOMATIS:</span>
+                    <p class="text-xs font-bold text-slate-800 leading-normal">
+                      Mulai: <span class="text-blue-700">{{ form.tanggal_mulai }}</span> s.d. Selesai: <span class="text-blue-700">{{ tanggalAkhir }}</span>
+                    </p>
+                    <span class="text-[9px] font-black text-emerald-600 uppercase tracking-wider block">
+                      Total: {{ form.durasi }} Hari Tayang (H-3 s.d. Hari-H Acara)
+                    </span>
+                  </div>
+                  <div v-else class="p-4 bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl flex items-center justify-center min-h-[70px]">
+                    <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest text-center">Tentukan tanggal puncak acara untuk menghitung jadwal</span>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <!-- 03: CONTENT DETAIL -->
+            <!-- 04: PENGIRIMAN BERKAS & MEDIA -->
             <div class="space-y-10">
               <div class="flex items-center gap-4">
-                 <div class="px-3 py-1 bg-slate-900 text-white text-[10px] font-black italic">03</div>
-                 <h4 class="text-xs font-black text-slate-400 uppercase tracking-[0.3em]">Materi & Berkas Penayangan</h4>
+                 <div class="px-3 py-1 bg-slate-900 text-white text-[10px] font-black italic">04</div>
+                 <h4 class="text-xs font-black text-slate-400 uppercase tracking-[0.3em]">Unggah Berkas / Media Materi</h4>
                  <div class="flex-grow h-px bg-slate-50"></div>
               </div>
-              <div class="space-y-8">
-                <div class="space-y-2">
-                  <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Judul / Tema Publikasi</label>
-                  <input v-model="form.judul" type="text" name="v_judul_iklan" placeholder="Contoh: Himbauan Jaga Kebersihan" autocomplete="new-password" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-2 border-slate-50 focus:border-blue-700 focus:bg-white outline-none transition-all font-bold" required />
-                </div>
-                <div class="grid md:grid-cols-2 gap-10">
-                  <div class="space-y-2">
-                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Kategori Publikasi</label>
-                    <select v-model="form.kategori" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-2 border-slate-50 focus:border-blue-700 focus:bg-white outline-none transition-all font-bold text-slate-900" required>
-                      <option value="">Pilih Kategori...</option>
-                      <option value="Pembangunan">Pembangunan Daerah</option>
-                      <option value="Himbauan">Himbauan Masyarakat</option>
-                      <option value="Pemerintahan">Info Pemerintahan</option>
-                      <option value="Layanan Masyarakat">Layanan Masyarakat</option>
-                      <option value="Agenda Pemkab">Agenda / Event Pemkab</option>
-                      <option value="Peringatan Hari Besar">HUT / Peringatan Hari Besar</option>
-                      <option value="Prestasi Daerah">Prestasi / Penghargaan</option>
-                      <option value="Pengumuman Resmi">Pengumuman Resmi</option>
-                      <option value="Lainnya">Lainnya (Kustom)...</option>
-                    </select>
+              
+              <div class="space-y-8 max-w-xl">
+                <div class="space-y-4">
+                  <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Metode Pengiriman Berkas</label>
+                  <div class="grid grid-cols-2 gap-3 p-1 bg-slate-100 rounded-xl">
+                    <button 
+                      type="button" 
+                      @click="uploadType = 'FILE'" 
+                      :class="uploadType === 'FILE' ? 'bg-white text-slate-900 shadow' : 'text-slate-500 hover:text-slate-900'"
+                      class="py-2.5 rounded-lg font-black text-[10px] uppercase tracking-wider transition-all text-center cursor-pointer"
+                    >
+                      📁 Upload File
+                    </button>
+                    <button 
+                      type="button" 
+                      @click="uploadType = 'LINK'" 
+                      :class="uploadType === 'LINK' ? 'bg-white text-slate-900 shadow' : 'text-slate-500 hover:text-slate-900'"
+                      class="py-2.5 rounded-lg font-black text-[10px] uppercase tracking-wider transition-all text-center cursor-pointer"
+                    >
+                      🔗 Link Drive
+                    </button>
                   </div>
-                  
-                  <div class="space-y-4">
-                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Metode Pengiriman Berkas</label>
-                    <div class="grid grid-cols-2 gap-3 p-1 bg-slate-100 rounded-xl">
-                      <button 
-                        type="button" 
-                        @click="uploadType = 'FILE'" 
-                        :class="uploadType === 'FILE' ? 'bg-white text-slate-900 shadow' : 'text-slate-500 hover:text-slate-900'"
-                        class="py-2.5 rounded-lg font-black text-[10px] uppercase tracking-wider transition-all text-center cursor-pointer"
-                      >
-                        📁 Upload File
-                      </button>
-                      <button 
-                        type="button" 
-                        @click="uploadType = 'LINK'" 
-                        :class="uploadType === 'LINK' ? 'bg-white text-slate-900 shadow' : 'text-slate-500 hover:text-slate-900'"
-                        class="py-2.5 rounded-lg font-black text-[10px] uppercase tracking-wider transition-all text-center cursor-pointer"
-                      >
-                        🔗 Link Drive
-                      </button>
-                    </div>
 
-                    <!-- Input Upload File -->
-                    <div v-if="uploadType === 'FILE'" class="space-y-2 animate-fade-in">
-                      <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 block">Pilih Berkas (Gambar/Video - Maks 100MB)</label>
-                      <input type="file" @change="handleFileUpload" accept="image/*,video/*" class="w-full text-[10px] font-black text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-slate-900 file:text-white hover:file:bg-blue-700 cursor-pointer" :required="uploadType === 'FILE'" />
-                    </div>
-
-                    <!-- Input Tautan Google Drive -->
-                    <div v-else class="space-y-2 animate-fade-in">
-                      <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 block">Tautan Google Drive</label>
-                      <input v-model="linkUrl" type="url" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-2 border-slate-50 focus:border-blue-700 focus:bg-white outline-none transition-all font-bold text-slate-900 placeholder:text-slate-300" placeholder="https://drive.google.com/file/d/.../view" :required="uploadType === 'LINK'" />
-                      <p class="text-[8px] font-bold text-slate-400 uppercase leading-normal tracking-tight">
-                        * Akses link harus disetel ke "Siapa saja yang memiliki link" dan opsi download diizinkan.
-                      </p>
-                    </div>
+                  <!-- Input Upload File -->
+                  <div v-if="uploadType === 'FILE'" class="space-y-2 animate-fade-in">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 block">Pilih Berkas (Gambar/Video - Maks 100MB)</label>
+                    <input type="file" @change="handleFileUpload" accept="image/*,video/*" class="w-full text-[10px] font-black text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-slate-900 file:text-white hover:file:bg-blue-700 cursor-pointer" :required="uploadType === 'FILE'" />
                   </div>
-                </div>
 
-                <!-- Custom Category Text Input -->
-                <div v-if="form.kategori === 'Lainnya'" class="space-y-2 animate-fade-in">
-                  <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Kategori Kustom Anda</label>
-                  <input v-model="form.kategori_kustom" type="text" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-2 border-slate-50 focus:border-blue-700 focus:bg-white outline-none transition-all font-bold text-slate-900" placeholder="Ketik kategori kustom..." required />
+                  <!-- Input Tautan Google Drive -->
+                  <div v-else class="space-y-2 animate-fade-in">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 block">Tautan Google Drive</label>
+                    <input v-model="linkUrl" type="url" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-2 border-slate-50 focus:border-blue-700 focus:bg-white outline-none transition-all font-bold text-slate-900 placeholder:text-slate-300" placeholder="https://drive.google.com/file/d/.../view" :required="uploadType === 'LINK'" />
+                    <p class="text-[8px] font-bold text-slate-400 uppercase leading-normal tracking-tight">
+                      * Akses link harus disetel ke "Siapa saja yang memiliki link" dan opsi download diizinkan.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -596,6 +652,9 @@ const todayDate = new Date().toISOString().split('T')[0]
 const uploadType = ref('FILE')
 const linkUrl = ref('')
 
+const metodeJadwal = ref<'MANUAL' | 'ACARA'>('MANUAL')
+const tanggalAcara = ref('')
+
 const form = reactive({
   jenis: 'OPD', instansi: '', pic: '', hp: '', email: '', judul: '', kategori: '', kategori_kustom: '',
   durasi: 1, satuan: 'HARI', tanggal_mulai: '', fileName: '', mimeType: '',
@@ -651,8 +710,75 @@ const calculateDurationFromDates = () => {
 }
 
 watch([() => form.tanggal_mulai, tanggalAkhir, caraDurasi], () => {
-  if (caraDurasi.value === 'TANGGAL_AKHIR') {
+  if (caraDurasi.value === 'TANGGAL_AKHIR' && metodeJadwal.value === 'MANUAL') {
     calculateDurationFromDates()
+  }
+})
+
+const calculateScheduleFromEvent = () => {
+  if (metodeJadwal.value === 'ACARA' && tanggalAcara.value) {
+    const todayStr = todayDate
+    
+    // Parse tanggal acara secara lokal
+    const parts = tanggalAcara.value.split('-')
+    const eventYear = parseInt(parts[0], 10)
+    const eventMonth = parseInt(parts[1], 10) - 1
+    const eventDay = parseInt(parts[2], 10)
+    
+    // Hitung tanggal mulai ideal (H-3 puncak)
+    const idealStart = new Date(eventYear, eventMonth, eventDay)
+    idealStart.setDate(idealStart.getDate() - 3)
+    
+    const y = idealStart.getFullYear()
+    const m = String(idealStart.getMonth() + 1).padStart(2, '0')
+    const d = String(idealStart.getDate()).padStart(2, '0')
+    const idealStartStr = `${y}-${m}-${d}`
+    
+    // Bandingkan dengan hari ini
+    if (idealStartStr >= todayStr) {
+      form.tanggal_mulai = idealStartStr
+    } else {
+      form.tanggal_mulai = todayStr
+    }
+    
+    // Tanggal akhir adalah hari puncak acara
+    tanggalAkhir.value = tanggalAcara.value
+    
+    // Hitung durasi tayang (selisih hari + 1)
+    const startParts = form.tanggal_mulai.split('-')
+    const start = new Date(parseInt(startParts[0], 10), parseInt(startParts[1], 10) - 1, parseInt(startParts[2], 10))
+    const end = new Date(eventYear, eventMonth, eventDay)
+    
+    const diffTime = end.getTime() - start.getTime()
+    const diffDays = Math.round(diffTime / (1000 * 3600 * 24))
+    
+    if (diffDays >= 0) {
+      form.durasi = diffDays + 1
+      form.satuan = 'HARI'
+    } else {
+      form.durasi = 0
+    }
+  }
+}
+
+watch([tanggalAcara, metodeJadwal], () => {
+  if (metodeJadwal.value === 'ACARA') {
+    calculateScheduleFromEvent()
+  }
+})
+
+watch(() => form.kategori, (newKategori) => {
+  if (newKategori === 'Agenda Pemkab' || newKategori === 'Peringatan Hari Besar') {
+    metodeJadwal.value = 'ACARA'
+  }
+})
+
+watch(metodeJadwal, (newMetode) => {
+  if (newMetode === 'MANUAL') {
+    form.tanggal_mulai = ''
+    form.durasi = 1
+    tanggalAkhir.value = ''
+    tanggalAcara.value = ''
   }
 })
 
@@ -699,7 +825,12 @@ const copySpecialLink = () => {
 watch(() => form.durasi, (newVal) => {
   // Hanya kunci 3 hari jika di FORM_STANDARD (publik)
   if (viewMode.value === 'FORM_STANDARD' && newVal && Number(newVal) > 3) {
-    form.durasi = 3
+    if (metodeJadwal.value !== 'ACARA') {
+      form.durasi = 3
+    } else if (Number(newVal) > 4) {
+      // Jika metode ACARA pada form standard, maksimal 4 hari (H-3 s.d. Hari H)
+      form.durasi = 4
+    }
   }
   // Kunci 30 hari jika di FORM_SPECIAL (khusus)
   if (viewMode.value === 'FORM_SPECIAL' && newVal && Number(newVal) > 30) {
@@ -779,24 +910,30 @@ const uploadInChunks = async (file: File, onProgress: (pct: number) => void): Pr
 }
 
 const handlePreSubmit = () => {
-  if (!form.tanggal_mulai) return alert('Pilih tanggal mulai tayang.')
-  if (viewMode.value === 'FORM_SPECIAL') {
-    if (caraDurasi.value === 'TANGGAL_AKHIR') {
-      if (!tanggalAkhir.value) return alert('Pilih tanggal akhir tayang.')
-      calculateDurationFromDates()
-    }
-    if (form.durasi > 30) {
-      return alert('⚠️ Durasi penayangan Formulir Khusus maksimal 30 hari!')
-    }
-    if (form.durasi <= 0) {
-      return alert('⚠️ Durasi penayangan tidak valid (harus minimal 1 hari).')
-    }
-  } else if (viewMode.value === 'FORM_STANDARD') {
-    if (form.durasi > 3) {
-      return alert('⚠️ Durasi penayangan Formulir Standard maksimal 3 hari!')
-    }
-    if (form.durasi <= 0) {
-      return alert('⚠️ Durasi penayangan tidak valid (harus minimal 1 hari).')
+  if (metodeJadwal.value === 'ACARA') {
+    if (!tanggalAcara.value) return alert('Pilih tanggal puncak acara.')
+    calculateScheduleFromEvent()
+    if (form.durasi <= 0) return alert('⚠️ Tanggal puncak acara tidak boleh sebelum hari ini!')
+  } else {
+    if (!form.tanggal_mulai) return alert('Pilih tanggal mulai tayang.')
+    if (viewMode.value === 'FORM_SPECIAL') {
+      if (caraDurasi.value === 'TANGGAL_AKHIR') {
+        if (!tanggalAkhir.value) return alert('Pilih tanggal akhir tayang.')
+        calculateDurationFromDates()
+      }
+      if (form.durasi > 30) {
+        return alert('⚠️ Durasi penayangan Formulir Khusus maksimal 30 hari!')
+      }
+      if (form.durasi <= 0) {
+        return alert('⚠️ Durasi penayangan tidak valid (harus minimal 1 hari).')
+      }
+    } else if (viewMode.value === 'FORM_STANDARD') {
+      if (form.durasi > 3) {
+        return alert('⚠️ Durasi penayangan Formulir Standard maksimal 3 hari!')
+      }
+      if (form.durasi <= 0) {
+        return alert('⚠️ Durasi penayangan tidak valid (harus minimal 1 hari).')
+      }
     }
   }
   const today = new Date(); const start = new Date(form.tanggal_mulai)
