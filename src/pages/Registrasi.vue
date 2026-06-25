@@ -367,9 +367,7 @@
                   <p class="text-[9px] font-bold text-slate-400 uppercase tracking-normal leading-snug mt-1.5 ml-1">
                     * Pengajuan konten wajib diajukan minimal H-7 (7 hari sebelum) tanggal puncak acara.
                   </p>
-                </div>
-                
-                <div class="space-y-2 flex flex-col justify-end">
+                 <div class="space-y-2 flex flex-col justify-end">
                   <div v-if="tanggalAcara && form.durasi > 0" class="p-4 bg-emerald-50 border-2 border-emerald-100/50 rounded-2xl space-y-1">
                     <span class="text-[9px] font-black text-emerald-700 uppercase tracking-widest block">📅 RENCANA JADWAL TAYANG OTOMATIS:</span>
                     <p class="text-xs font-bold text-slate-800 leading-normal">
@@ -382,21 +380,23 @@
                       ⚠️ KONSEKUENSI PENGAJUAN MENDESAK: Jadwal tayang tidak maksimal 3 hari, disesuaikan dengan sisa hari menuju puncak acara (dipotong menjadi {{ form.durasi }} hari).
                     </span>
                   </div>
-                  <div v-else class="p-4 bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl flex items-center justify-center min-h-[70px]">
-                    <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest text-center">Tentukan tanggal puncak acara untuk menghitung jadwal</span>
+                  
+                  <div v-else class="p-5 bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl space-y-3 text-[9px] text-slate-400 uppercase tracking-wider font-bold leading-normal">
+                    <div class="text-center font-black text-slate-500 pb-1.5 border-b border-dashed border-slate-200">
+                      💡 TENTUKAN TANGGAL PUNCAK ACARA UNTUK MENGHITUNG JADWAL TAYANG
+                    </div>
+                    <div class="space-y-2">
+                      <div>
+                        <span class="font-black text-slate-500 block">📅 PENGURANGAN DURASI TAYANG:</span>
+                        Jadwal tayang tidak maksimal 3 hari jika pengajuan mendesak. Durasi disesuaikan otomatis dengan sisa hari dari tanggal upload ke puncak acara (misal: upload tgl 25, acara tgl 27 = terpotong 2 hari). Pengajuan minimal H-7 dari hari puncak.
+                      </div>
+                      <div class="pt-1.5 border-t border-slate-200/30">
+                        <span class="font-black text-slate-500 block">🔍 VERIFIKASI TANGGAL KONTEN:</span>
+                        Admin akan memverifikasi kesesuaian tanggal di form dengan tanggal acara di flyer/video. Jika tidak cocok, pengajuan akan ditolak.
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-
-              <!-- Verification policy alert box -->
-              <div class="p-5 bg-slate-50 border-2 border-slate-100 rounded-2xl text-[10px] font-bold text-slate-500 uppercase tracking-normal leading-relaxed max-w-xl space-y-3">
-                <div>
-                  <span class="font-black text-slate-900 block mb-1">📅 KETENTUAN PENGAJUAN & PENYESUAIAN JADWAL:</span>
-                  Jadwal tayang tidak maksimal 3 hari jika pengajuan dilakukan mendesak. Durasi tayang akan disesuaikan secara otomatis berdasarkan sisa hari antara tanggal Anda mengunggah (upload) dengan tanggal puncak acara (misalnya: jika upload tanggal 25 dan acara tanggal 27, maka jadwal tayang sudah terpotong 2 hari). Oleh karena itu, hindari pengajuan mendesak dan lakukan pengajuan minimal H-7 dari tanggal puncak acara.
-                </div>
-                <div class="pt-2.5 border-t border-slate-200/50">
-                  <span class="font-black text-slate-900 block mb-1">🔍 VERIFIKASI KESESUAIAN TANGGAL KONTEN:</span>
-                  Admin akan melakukan verifikasi ketat untuk mencocokkan tanggal penayangan yang diinput di form dengan tanggal acara yang tertera di dalam flyer/video materi yang dikirimkan. Jika terdapat ketidakcocokan, pengajuan Anda dapat ditolak oleh Admin.
+                  </div>
                 </div>
               </div>
             </div>
