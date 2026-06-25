@@ -37,6 +37,7 @@
                   autoplay 
                   muted 
                   @ended="onVideoEnded"
+                  @error="onVideoMockupError"
                   playsinline
                   class="w-full h-full object-cover transition-all duration-1000"
                 ></video>
@@ -143,6 +144,9 @@
                         loop 
                         autoplay
                         playsinline
+                        @playing="onVideoLoad"
+                        @loadeddata="onVideoLoad"
+                        @error="handleVideoError"
                       ></video>
                     </template>
                     <img 
@@ -273,6 +277,9 @@
                           loop 
                           autoplay
                           playsinline
+                          @playing="onVideoLoad"
+                          @loadeddata="onVideoLoad"
+                          @error="handleVideoError"
                         ></video>
                       </template>
                       <img 
@@ -589,6 +596,20 @@ const handleImageError = (e: any) => {
 }
 
 const onImageLoad = (e: any) => {
+  if (e.target.previousElementSibling) e.target.previousElementSibling.style.display = 'none'
+}
+
+const onVideoMockupError = () => {
+  console.warn('[Mockup] Video failed to load, skipping to next slide immediately')
+  advanceSlideshow()
+}
+
+const onVideoLoad = (e: any) => {
+  if (e.target.previousElementSibling) e.target.previousElementSibling.style.display = 'none'
+}
+
+const handleVideoError = (e: any) => {
+  e.target.style.opacity = '0'
   if (e.target.previousElementSibling) e.target.previousElementSibling.style.display = 'none'
 }
 
