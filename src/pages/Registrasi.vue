@@ -367,7 +367,9 @@
                   <p class="text-[9px] font-bold text-slate-400 uppercase tracking-normal leading-snug mt-1.5 ml-1">
                     * Pengajuan konten wajib diajukan minimal H-7 (7 hari sebelum) tanggal puncak acara.
                   </p>
-                 <div class="space-y-2 flex flex-col justify-end">
+                </div>
+                
+                <div class="space-y-2 flex flex-col justify-end">
                   <div v-if="tanggalAcara && form.durasi > 0" class="p-4 bg-emerald-50 border-2 border-emerald-100/50 rounded-2xl space-y-1">
                     <span class="text-[9px] font-black text-emerald-700 uppercase tracking-widest block">📅 RENCANA JADWAL TAYANG OTOMATIS:</span>
                     <p class="text-xs font-bold text-slate-800 leading-normal">
@@ -388,14 +390,13 @@
                     <div class="space-y-2">
                       <div>
                         <span class="font-black text-slate-500 block">📅 PENGURANGAN DURASI TAYANG:</span>
-                        Jadwal tayang tidak maksimal 3 hari jika pengajuan mendesak. Durasi disesuaikan otomatis dengan sisa hari dari tanggal upload ke puncak acara (misal: upload tgl 25, acara tgl 27 = terpotong 2 hari). Pengajuan minimal H-7 dari hari puncak.
+                        Jadwal tayang tidak maksimal 3 hari jika pengajuan mendesak. Durasi disesuaikan otomatis dengan sisa hari dari tanggal upload ke puncak acara (Minimal H-7).
                       </div>
                       <div class="pt-1.5 border-t border-slate-200/30">
                         <span class="font-black text-slate-500 block">🔍 VERIFIKASI TANGGAL KONTEN:</span>
                         Admin akan memverifikasi kesesuaian tanggal di form dengan tanggal acara di flyer/video. Jika tidak cocok, pengajuan akan ditolak.
                       </div>
                     </div>
-                  </div>
                   </div>
                 </div>
               </div>
