@@ -165,6 +165,15 @@ Dokumen ini adalah rekaman lengkap mengenai seluruh fitur, penyelarasan algoritm
 *   **HUD Kontrol Terpadu**: Mempertahankan panel HUD kontrol interaktif melayang yang mendukung play/pause transisi, penyesuaian rasio aspek display (fit vs cover scale), dan navigasi slide secara manual.
 *   **Pembersihan TypeScript**: Menghapus variabel dan watcher tak terpakai (`mockupVideoRef`, `mockupVideoLoaded`, watcher URL) untuk memenuhi linting `noUnusedLocals` compiler Vue-TSC.
 
+### 10. Fitur Pengeditan Durasi & Rentang Tanggal Tayang Admin (`src/pages/admin/Gallery.vue` & `Submissions.vue`)
+*   **Modal Kelola Status & Jadwal**: Pada modal pengeditan materi (tombol **"Kelola"**), kini tersedia panel khusus **"Jadwal & Durasi Tayang"**.
+*   **Dua Metode Input Penjadwalan**:
+    1.  *Durasi Hari/Waktu*: Admin dapat mengubah jumlah durasi (`durasi`) dan satuan (`satuan`: Hari, Minggu, Bulan, Tahun, Selamanya).
+    2.  *Rentang Tanggal (Mulai - Akhir)*: Admin dapat menentukan tanggal mulai dan tanggal akhir tayang secara langsung. Sistem secara otomatis menghitung selisih hari tayang secara *real-time*.
+*   **Sinkronisasi Backend Apps Script (`google-apps-script.js`)**:
+    *   Fungsi `handleUpdateStatus` diperbarui agar menyimpan perubahan `durasi` (Kolom 13) dan `satuan` (Kolom 14) ke spreadsheet.
+    *   Fungsi `handleGetGallery` diperbarui agar menyertakan data `durasi`, `satuan`, dan `catatan` pada setiap objek balasan, sehingga data yang ditampilkan pada modal edit selalu akurat sesuai kondisi di database.
+
 ---
 
 ## 4. Integrasi Git & Sinkronisasi Ulang (CLASP)
