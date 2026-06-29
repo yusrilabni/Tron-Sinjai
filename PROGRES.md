@@ -165,14 +165,16 @@ Dokumen ini adalah rekaman lengkap mengenai seluruh fitur, penyelarasan algoritm
 *   **HUD Kontrol Terpadu**: Mempertahankan panel HUD kontrol interaktif melayang yang mendukung play/pause transisi, penyesuaian rasio aspek display (fit vs cover scale), dan navigasi slide secara manual.
 *   **Pembersihan TypeScript**: Menghapus variabel dan watcher tak terpakai (`mockupVideoRef`, `mockupVideoLoaded`, watcher URL) untuk memenuhi linting `noUnusedLocals` compiler Vue-TSC.
 
-### 10. Fitur Pengeditan Durasi & Rentang Tanggal Tayang Admin (`src/pages/admin/Gallery.vue` & `Submissions.vue`)
-*   **Modal Kelola Status & Jadwal**: Pada modal pengeditan materi (tombol **"Kelola"**), kini tersedia panel khusus **"Jadwal & Durasi Tayang"**.
-*   **Dua Metode Input Penjadwalan**:
-    1.  *Durasi Hari/Waktu*: Admin dapat mengubah jumlah durasi (`durasi`) dan satuan (`satuan`: Hari, Minggu, Bulan, Tahun, Selamanya).
-    2.  *Rentang Tanggal (Mulai - Akhir)*: Admin dapat menentukan tanggal mulai dan tanggal akhir tayang secara langsung. Sistem secara otomatis menghitung selisih hari tayang secara *real-time*.
+### 10. Fitur Pengeditan Durasi & Rentang Tanggal Tayang Khusus Konten Galeri Admin (`src/pages/admin/Gallery.vue`)
+*   **Pembedaan Jelas Tombol Aksi**:
+    *   **"Urutkan / Kelola Grup"**: Tombol putih khusus pada kartu grup untuk mengatur urutan dan isi anggota koleksi grup.
+    *   **"✏️ Edit"**: Tombol biru khusus yang tersedia pada setiap kartu materi media untuk membuka formulir pengeditan jadwal dan durasi tayang.
+*   **Modal Form "Edit Jadwal & Durasi Tayang Konten"**:
+    *   Pengeditan durasi dan rentang tanggal tayang difokuskan secara eksplisit pada halaman [Gallery.vue](file:///C:/laragon/www/videotron-sinjai-portal/src/pages/admin/Gallery.vue).
+    *   Menyediakan pilihan metode pengeditan *Durasi Hari* (angka durasi + satuan waktu) dan *Rentang Tanggal Mulai - Akhir* dengan kalkulasi selisih hari otomatis.
 *   **Sinkronisasi Backend Apps Script (`google-apps-script.js`)**:
-    *   Fungsi `handleUpdateStatus` diperbarui agar menyimpan perubahan `durasi` (Kolom 13) dan `satuan` (Kolom 14) ke spreadsheet.
-    *   Fungsi `handleGetGallery` diperbarui agar menyertakan data `durasi`, `satuan`, dan `catatan` pada setiap objek balasan, sehingga data yang ditampilkan pada modal edit selalu akurat sesuai kondisi di database.
+    *   Fungsi `handleUpdateStatus` menyimpan perubahan `durasi` (Kolom 13) dan `satuan` (Kolom 14) ke spreadsheet.
+    *   Fungsi `handleGetGallery` mengembalikan data `durasi`, `satuan`, dan `catatan` pada setiap objek balasan.
 
 ---
 
