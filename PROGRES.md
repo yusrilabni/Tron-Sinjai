@@ -172,6 +172,8 @@ Dokumen ini adalah rekaman lengkap mengenai seluruh fitur, penyelarasan algoritm
 *   **Modal Form "Edit Jadwal & Durasi Tayang Konten"**:
     *   Pengeditan durasi dan rentang tanggal tayang difokuskan secara eksplisit pada halaman [Gallery.vue](file:///C:/laragon/www/videotron-sinjai-portal/src/pages/admin/Gallery.vue).
     *   Menyediakan pilihan metode pengeditan *Durasi Hari* (angka durasi + satuan waktu) dan *Rentang Tanggal Mulai - Akhir* dengan kalkulasi selisih hari otomatis.
+*   **Kalkulasi Tanggal Akhir Inklusif (Perbaikan Bug Kadaluarsa)**:
+    *   Memperbaiki kalkulasi selisih hari dari rentang tanggal (`tanggal_mulai` dan `tanggal_akhir`) menggunakan logika inklusif `(end - start) + 1`. Jika admin memilih tanggal 25 s/d 27, total durasi adalah 3 hari penuh, sehingga materi **tetap tayang pada tanggal 27** dan baru menjadi kedaluwarsa pada **tanggal 28 (H+1)**.
 *   **Sinkronisasi Backend Apps Script (`google-apps-script.js`)**:
     *   Fungsi `handleUpdateStatus` menyimpan perubahan `durasi` (Kolom 13) dan `satuan` (Kolom 14) ke spreadsheet.
     *   Fungsi `handleGetGallery` mengembalikan data `durasi`, `satuan`, dan `catatan` pada setiap objek balasan.
