@@ -275,11 +275,89 @@
               </div>
             </div>
 
-            <!-- Tampilkan Date Picker HANYA jika status asal materi adalah EXPIRED -->
-            <div v-if="activeSub && activeSub.status === 'EXPIRED' && (updateForm.status === 'DISETUJUI' || updateForm.status === 'TAYANG')" class="space-y-2 p-4 bg-emerald-50 rounded-xl border-2 border-emerald-100 animate-in slide-in-from-top-2 duration-300">
-               <label class="text-[10px] font-black text-emerald-700 uppercase tracking-widest">Tanggal Mulai Baru</label>
-               <input v-model="updateForm.tanggal_mulai" type="date" class="w-full px-4 py-2.5 rounded-xl bg-white border-2 border-slate-200 focus:border-emerald-500 outline-none transition-all font-black text-slate-900" required />
-               <p class="text-[9px] font-bold text-emerald-500 uppercase">* Masukkan tanggal mulai baru untuk mengaktifkan kembali materi yang kedaluwarsa.</p>
+            <!-- Pengaturan Tanggal & Durasi Tayang -->
+            <div class="space-y-4 p-5 bg-slate-50 rounded-2xl border-2 border-slate-100">
+               <div class="text-[10px] font-black text-slate-900 uppercase tracking-widest flex items-center justify-between">
+                 <span class="flex items-center gap-1.5">📅 Jadwal & Durasi Tayang</span>
+                 <span v-if="updateForm.satuan === 'HARI' && updateForm.durasi < 3" class="text-[8px] font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded border border-red-100">⚠️ &lt; 3 Hari</span>
+               </div>
+
+               <!-- Pilihan Metode Durasi -->
+               <div v-if="updateForm.satuan !== 'SELAMANYA'" class="flex gap-2 p-1 bg-slate-200/60 rounded-xl">
+                 <button 
+                   type="button" 
+                   @click="updateCaraDurasi = 'DURASI'"
+                   :class="updateCaraDurasi === 'DURASI' ? 'bg-white text-blue-700 shadow font-black' : 'text-slate-500 font-bold hover:text-slate-900'"
+                   class="flex-1 py-1.5 text-[9px] uppercase tracking-wider rounded-lg transition-all cursor-pointer"
+                 >
+                   🗓️ Durasi Hari
+                 </button>
+                 <button 
+                   type="button" 
+                   @click="updateCaraDurasi = 'TANGGAL_AKHIR'"
+                   :class="updateCaraDurasi === 'TANGGAL_AKHIR' ? 'bg-white text-blue-700 shadow font-black' : 'text-slate-500 font-bold hover:text-slate-900'"
+                   class="flex-1 py-1.5 text-[9px] uppercase tracking-wider rounded-lg transition-all cursor-pointer"
+                 >
+                   🏁 Tanggal Mulai - Akhir
+                 </button>
+               </div>
+
+               <!-- Tanggal Mulai -->
+               <div class="space-y-1.5">
+                 <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Tanggal Mulai Tayang</label>
+                 <input 
+                   v-model="updateForm.tanggal_mulai" 
+                   type="date" 
+                   class="w-full px-4 py-3 rounded-xl bg-white border-2 border-slate-100 focus:border-blue-700 outline-none transition-all font-black text-slate-900 text-xs" 
+                   required 
+                 />
+               </div>
+
+               <!-- If method: TANGGAL_AKHIR -->
+               <div v-if="updateForm.satuan !== 'SELAMANYA' && updateCaraDurasi === 'TANGGAL_AKHIR'" class="space-y-1.5">
+                 <div class="flex justify-between items-center">
+                   <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Tanggal Akhir Tayang</label>
+                   <span v-if="updateForm.tanggal_mulai && updateTanggalAkhir && updateForm.durasi > 0" class="text-[9px] font-black text-blue-700 bg-blue-100 px-2 py-0.5 rounded uppercase tracking-wider">
+                     = {{ updateForm.durasi }} Hari Tayang
+                   </span>
+                 </div>
+                 <input 
+                   v-model="updateTanggalAkhir" 
+                   type="date" 
+                   :min="updateForm.tanggal_mulai" 
+                   class="w-full px-4 py-3 rounded-xl bg-white border-2 border-slate-100 focus:border-blue-700 outline-none transition-all font-black text-slate-900 text-xs" 
+                   required 
+                 />
+               </div>
+
+               <!-- If method: DURASI -->
+               <div v-else class="space-y-1.5">
+                 <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Durasi Penayangan</label>
+                 <div class="flex gap-2">
+                   <input 
+                     v-if="updateForm.satuan !== 'SELAMANYA'"
+                     v-model="updateForm.durasi" 
+                     type="number" 
+                     min="1" 
+                     max="999" 
+                     class="flex-grow px-4 py-3 rounded-xl bg-white border-2 border-slate-100 focus:border-blue-700 outline-none transition-all font-black text-slate-900 text-xs" 
+                     required 
+                   />
+                   <div v-else class="flex-grow px-4 py-3 rounded-xl bg-white border-2 border-slate-100 text-slate-400 font-black text-[10px] uppercase tracking-widest flex items-center">
+                     ♾️ Tanpa Batas Waktu
+                   </div>
+                   <select 
+                     v-model="updateForm.satuan" 
+                     class="w-32 px-3 rounded-xl bg-blue-50 border-2 border-blue-100 font-black text-[9px] uppercase tracking-widest outline-none text-blue-700"
+                   >
+                     <option value="HARI">Hari</option>
+                     <option value="MINGGU">Minggu</option>
+                     <option value="BULAN">Bulan</option>
+                     <option value="TAHUN">Tahun</option>
+                     <option value="SELAMANYA">Selamanya</option>
+                   </select>
+                 </div>
+               </div>
             </div>
 
             <!-- Conditional File Upload for TAYANG -->
@@ -337,7 +415,46 @@ const savingSettings = ref(false)
 const showSettingsModal = ref(false)
 const activeSub = ref<any>(null)
 
-const updateForm = reactive({ status: '', catatan: '', docBase64: '', docMimeType: '', allow_edit: false, tanggal_mulai: '' })
+const updateForm = reactive({ 
+  status: '', 
+  catatan: '', 
+  docBase64: '', 
+  docMimeType: '', 
+  allow_edit: false, 
+  tanggal_mulai: '',
+  durasi: 1,
+  satuan: 'HARI'
+})
+
+const updateCaraDurasi = ref('DURASI')
+const updateTanggalAkhir = ref('')
+
+const calculateUpdateDurationFromDates = () => {
+  if (updateCaraDurasi.value === 'TANGGAL_AKHIR' && updateForm.tanggal_mulai && updateTanggalAkhir.value) {
+    const start = new Date(updateForm.tanggal_mulai)
+    const end = new Date(updateTanggalAkhir.value)
+    const diffTime = end.getTime() - start.getTime()
+    const diffDays = Math.ceil(diffTime / (1000 * 3600 * 24))
+    if (diffDays >= 0) {
+      updateForm.durasi = diffDays
+      updateForm.satuan = 'HARI'
+    } else {
+      updateForm.durasi = 0
+    }
+  }
+}
+
+watch([() => updateForm.tanggal_mulai, updateTanggalAkhir, updateCaraDurasi], () => {
+  if (updateCaraDurasi.value === 'TANGGAL_AKHIR') {
+    calculateUpdateDurationFromDates()
+  }
+})
+
+watch(() => updateForm.satuan, (newVal) => {
+  if (newVal === 'SELAMANYA') {
+    updateForm.durasi = 1
+  }
+})
 
 const rowProgress = ref<Record<string, number>>({})
 
@@ -446,9 +563,49 @@ const openAction = (sub: any) => {
   updateForm.status = sub.status === 'MENUNGGU_VERIFIKASI' ? '' : sub.status
   updateForm.catatan = sub.catatan || ''
   updateForm.allow_edit = sub.allow_edit || false
-  updateForm.tanggal_mulai = sub.status === 'EXPIRED' ? new Date().toISOString().split('T')[0] : ''
+  
+  let startDateStr = ''
+  if (sub.tanggal_mulai) {
+    try {
+      const d = new Date(sub.tanggal_mulai)
+      if (!isNaN(d.getTime())) {
+        const tzOffset = d.getTimezoneOffset() * 60000
+        const localISOTime = (new Date(d.getTime() - tzOffset)).toISOString().slice(0, 10)
+        startDateStr = localISOTime
+      } else {
+        startDateStr = String(sub.tanggal_mulai).split('T')[0]
+      }
+    } catch(e) {
+      startDateStr = String(sub.tanggal_mulai).split('T')[0]
+    }
+  } else {
+    startDateStr = new Date().toISOString().split('T')[0]
+  }
+  
+  updateForm.tanggal_mulai = startDateStr
+  updateForm.durasi = parseInt(sub.durasi) || 1
+  updateForm.satuan = sub.satuan || 'HARI'
   updateForm.docBase64 = ''
   updateForm.docMimeType = ''
+  
+  updateCaraDurasi.value = 'DURASI'
+  if (startDateStr && updateForm.durasi > 0 && updateForm.satuan !== 'SELAMANYA') {
+    try {
+      const startParts = startDateStr.split('-')
+      const start = new Date(parseInt(startParts[0]), parseInt(startParts[1]) - 1, parseInt(startParts[2]))
+      let multiplier = 1
+      if (updateForm.satuan === 'MINGGU') multiplier = 7
+      if (updateForm.satuan === 'BULAN') multiplier = 30
+      if (updateForm.satuan === 'TAHUN') multiplier = 365
+      const endDate = new Date(start.getTime() + (updateForm.durasi * multiplier * 24 * 60 * 60 * 1000))
+      const tzOffset = endDate.getTimezoneOffset() * 60000
+      updateTanggalAkhir.value = (new Date(endDate.getTime() - tzOffset)).toISOString().slice(0, 10)
+    } catch(e) {
+      updateTanggalAkhir.value = ''
+    }
+  } else {
+    updateTanggalAkhir.value = ''
+  }
 }
 
 const handleDocUpload = (e: any) => {
@@ -464,6 +621,10 @@ const handleDocUpload = (e: any) => {
 
 const handleUpdate = async () => {
   if (updating.value) return
+  if (updateCaraDurasi.value === 'TANGGAL_AKHIR') {
+    if (!updateTanggalAkhir.value) return alert('Pilih tanggal akhir tayang.')
+    if (updateForm.durasi <= 0) return alert('Tanggal akhir tayang harus setelah tanggal mulai tayang.')
+  }
   updating.value = true
   try {
     const res = await updateSubmissionStatus({ 
@@ -473,7 +634,9 @@ const handleUpdate = async () => {
       docBase64: updateForm.docBase64,
       docMimeType: updateForm.docMimeType,
       allow_edit: updateForm.allow_edit,
-      tanggal_mulai: updateForm.tanggal_mulai
+      tanggal_mulai: updateForm.tanggal_mulai,
+      durasi: updateForm.durasi,
+      satuan: updateForm.satuan
     })
     if (res.success) { activeSub.value = null; fetchAll() }
   } finally { updating.value = false }

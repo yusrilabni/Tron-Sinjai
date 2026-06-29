@@ -159,6 +159,12 @@ Dokumen ini adalah rekaman lengkap mengenai seluruh fitur, penyelarasan algoritm
     *   Menerapkan pembaruan dropdown sub-kategori dan kolom input kustom kondisional yang sama persis dengan formulir registrasi klien untuk upload manual admin.
     *   Menyesuaikan fungsi `handleUpload` untuk memvalidasi dan mengirimkan data kategori kustom saat admin mempublikasikan materi secara manual.
 
+### 9. Optimalisasi Pemutar Video Mockup Videotron di Beranda (`src/pages/Home.vue`)
+*   **Pembalikan ke Mode Iframe**: Setelah pengujian dengan elemen `<video>` native terbentur oleh batasan kuota unduhan (*download quota limit*) Google Drive yang memicu *infinite loading* (layar hitam) pada browser, sistem dikembalikan ke penggunaan pemutar berbasis `iframe` (`getIframeUrl` yang menghasilkan `/preview`).
+*   **Parameter default mute & autoplay**: Menyematkan parameter `autoplay=1&mute=1&muted=1&volume=0` ke URL preview Drive guna memberi instruksi bisu (muted) default pada player internal.
+*   **HUD Kontrol Terpadu**: Mempertahankan panel HUD kontrol interaktif melayang yang mendukung play/pause transisi, penyesuaian rasio aspek display (fit vs cover scale), dan navigasi slide secara manual.
+*   **Pembersihan TypeScript**: Menghapus variabel dan watcher tak terpakai (`mockupVideoRef`, `mockupVideoLoaded`, watcher URL) untuk memenuhi linting `noUnusedLocals` compiler Vue-TSC.
+
 ---
 
 ## 4. Integrasi Git & Sinkronisasi Ulang (CLASP)

@@ -341,6 +341,12 @@ function handleUpdateStatus(payload, adminUser) {
     if (payload.tanggal_mulai) {
       sheet.getRange(target._rowIdx, 15).setValue(payload.tanggal_mulai);
     }
+    if (payload.durasi !== undefined && payload.durasi !== null && payload.durasi !== '') {
+      sheet.getRange(target._rowIdx, 13).setValue(parseInt(payload.durasi) || 0);
+    }
+    if (payload.satuan) {
+      sheet.getRange(target._rowIdx, 14).setValue(payload.satuan);
+    }
     
     if (payload.docUrlDirect) {
       sheet.getRange(target._rowIdx, 17).setValue(payload.docUrlDirect);
@@ -500,6 +506,9 @@ function handleGetGallery() {
         status: sub.status,
         jenis: sub.jenis,
         tanggal_mulai: sub.tanggal_mulai,
+        durasi: sub.durasi,
+        satuan: sub.satuan,
+        catatan: sub.catatan,
         sisa_hari: sub.sisa_hari, 
         is_expired: sub.is_expired 
       });
