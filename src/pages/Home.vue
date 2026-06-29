@@ -210,9 +210,15 @@
                     />
                     
                     <!-- MAIN STATUS LABELS (FORCED VISIBILITY) -->
-                    <div class="absolute top-4 left-4 z-50 flex flex-col gap-2">
-                       <div v-if="item.is_expired || item.status === 'EXPIRED'" class="px-4 py-2 bg-red-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg shadow-2xl border-2 border-red-500/50">
-                          KADALUARSA
+                    <div class="absolute top-4 left-4 z-50 flex flex-col gap-2 max-w-[85%]">
+                       <!-- Custom Badge for New / Re-published Today -->
+                       <div v-for="(b, idx) in getCardBadges(item)" :key="idx" :class="b.class" class="px-3 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-lg shadow-2xl border flex items-center gap-1.5 backdrop-blur-md">
+                          {{ b.text }}
+                       </div>
+
+                       <div v-if="item.is_expired || item.status === 'EXPIRED'" class="px-4 py-2 bg-red-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg shadow-2xl border-2 border-red-500/50 flex flex-col gap-0.5">
+                          <span>🔴 KADALUARSA</span>
+                          <span v-if="item.catatan" class="text-[8px] text-red-200 normal-case font-bold line-clamp-1">Catatan Admin: {{ item.catatan }}</span>
                        </div>
                        <div v-else-if="item.status === 'DISETUJUI'" class="px-4 py-2 bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg shadow-2xl border-2 border-blue-500/50 italic">
                           DISETUJUI (BELUM TAYANG)
@@ -220,7 +226,7 @@
                        <div v-else-if="item.sisa_hari === 0" class="px-4 py-2 bg-red-500 text-white text-[10px] font-black uppercase tracking-widest rounded-lg shadow-2xl border-2 border-red-400/50 animate-pulse">
                           HARI TERAKHIR
                        </div>
-                       <div v-else-if="item.sisa_hari !== 999 && item.sisa_hari !== 99999" class="px-4 py-2 bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg shadow-2xl border-2 border-emerald-500/50 italic animate-pulse">
+                       <div v-else-if="item.sisa_hari !== 999 && item.sisa_hari !== 99999" class="px-4 py-2 bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg shadow-2xl border-2 border-emerald-500/50 italic">
                           TAYANG (SISA {{ item.sisa_hari }} HARI)
                        </div>
                        <div v-else class="px-4 py-2 bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest rounded-lg shadow-2xl border-2 border-emerald-500/50 italic">
@@ -228,7 +234,7 @@
                        </div>
 
                        <!-- Album indicator badge -->
-                       <div v-if="item.url && item.url.includes('|')" class="px-3 py-1.5 bg-slate-950/80 backdrop-blur-md text-white text-[9px] font-black uppercase tracking-widest rounded-lg border border-white/10 flex items-center gap-1">
+                       <div v-if="item.url && item.url.includes('|')" class="px-3 py-1.5 bg-slate-950/80 backdrop-blur-md text-white text-[9px] font-black uppercase tracking-widest rounded-lg border border-white/10 flex items-center gap-1 w-max">
                           <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 7v10a2 2 0 002 2h12a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" /></svg>
                           📁 {{ item.url.split('|').length }} FOTO
                        </div>
@@ -244,8 +250,9 @@
                           </div>
                           <button @click.stop="downloadFile(item.url)" class="w-10 h-10 bg-white/10 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center text-white hover:bg-blue-700 hover:border-blue-600 transition-all shadow-xl group/btn"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 group-hover/btn:translate-y-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg></button>
                         </div>
-                        <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest border-t border-white/10 pt-3">
+                        <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest border-t border-white/10 pt-3 flex flex-col gap-1.5">
                            <span>Mulai Tayang: {{ formatDate(item.tanggal_mulai || item.tanggal) }}</span>
+                           <span v-if="item.catatan && item.status !== 'EXPIRED'" class="text-amber-300 normal-case bg-amber-950/70 p-2 rounded-lg border border-amber-500/30 font-semibold line-clamp-2">📝 Catatan Admin: {{ item.catatan }}</span>
                         </div>
                       </div>
                     </div>
@@ -351,9 +358,15 @@
                       />
                       
                       <!-- STATUS LABELS -->
-                      <div class="absolute top-3 left-3 z-50 flex flex-col gap-1.5">
-                         <div v-if="child.is_expired || child.status === 'EXPIRED'" class="px-2 py-1 bg-red-600 text-white text-[7px] font-black uppercase tracking-widest rounded shadow">
-                            KADALUARSA
+                      <div class="absolute top-3 left-3 z-50 flex flex-col gap-1.5 max-w-[85%]">
+                         <!-- Custom Badge for New / Re-published Today -->
+                         <div v-for="(b, idx) in getCardBadges(child)" :key="idx" :class="b.class" class="px-2 py-1 text-[7px] font-black uppercase tracking-widest rounded shadow border flex items-center gap-1 backdrop-blur-md">
+                            {{ b.text }}
+                         </div>
+
+                         <div v-if="child.is_expired || child.status === 'EXPIRED'" class="px-2 py-1 bg-red-600 text-white text-[7px] font-black uppercase tracking-widest rounded shadow flex flex-col gap-0.5">
+                            <span>🔴 KADALUARSA</span>
+                            <span v-if="child.catatan" class="text-[6px] text-red-200 normal-case font-bold line-clamp-1">Catatan: {{ child.catatan }}</span>
                          </div>
                          <div v-else-if="child.status === 'DISETUJUI'" class="px-2 py-1 bg-blue-600 text-white text-[7px] font-black uppercase tracking-widest rounded shadow italic">
                             DISETUJUI
@@ -361,7 +374,7 @@
                          <div v-else-if="child.sisa_hari === 0" class="px-2 py-1 bg-red-500 text-white text-[7px] font-black uppercase tracking-widest rounded shadow animate-pulse">
                             HARI TERAKHIR
                          </div>
-                         <div v-else-if="child.sisa_hari !== 999 && child.sisa_hari !== 99999" class="px-2 py-1 bg-emerald-600 text-white text-[7px] font-black uppercase tracking-widest rounded shadow italic animate-pulse">
+                         <div v-else-if="child.sisa_hari !== 999 && child.sisa_hari !== 99999" class="px-2 py-1 bg-emerald-600 text-white text-[7px] font-black uppercase tracking-widest rounded shadow italic">
                             TAYANG (SISA {{ child.sisa_hari }} HARI)
                          </div>
                          <div v-else class="px-2 py-1 bg-emerald-600 text-white text-[7px] font-black uppercase tracking-widest rounded shadow italic">
@@ -379,8 +392,9 @@
                             </div>
                             <button @click.stop="downloadFile(child.url)" class="w-8 h-8 bg-white/10 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center text-white hover:bg-blue-700 hover:border-blue-600 transition-all shadow-lg group/btn shrink-0 ml-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg></button>
                           </div>
-                          <div class="text-[8px] font-bold text-slate-400 uppercase tracking-widest border-t border-white/10 pt-2 flex justify-between">
+                          <div class="text-[8px] font-bold text-slate-400 uppercase tracking-widest border-t border-white/10 pt-2 flex flex-col gap-1">
                              <span>Mulai: {{ formatDate(child.tanggal_mulai || child.tanggal) }}</span>
+                             <span v-if="child.catatan && child.status !== 'EXPIRED'" class="text-amber-300 normal-case bg-amber-950/70 p-1.5 rounded border border-amber-500/30 font-semibold line-clamp-2">📝 Catatan Admin: {{ child.catatan }}</span>
                           </div>
                         </div>
                       </div>
@@ -697,6 +711,45 @@ const handleVideoError = (e: any) => {
 const formatDate = (dateStr: string) => {
   const date = new Date(dateStr)
   return new Intl.DateTimeFormat('id-ID', { month: 'short', day: 'numeric', year: 'numeric' }).format(date)
+}
+
+const isToday = (dateStr: string) => {
+  if (!dateStr) return false
+  try {
+    const tzOffset = new Date().getTimezoneOffset() * 60000
+    const todayStr = (new Date(Date.now() - tzOffset)).toISOString().slice(0, 10)
+    
+    let localDStr = ''
+    if (typeof dateStr === 'string' && dateStr.includes('T')) {
+      localDStr = dateStr.split('T')[0]
+    } else {
+      const d = new Date(dateStr)
+      localDStr = (new Date(d.getTime() - tzOffset)).toISOString().slice(0, 10)
+    }
+    return localDStr === todayStr
+  } catch(e) { return false }
+}
+
+const getCardBadges = (item: any) => {
+  const badges: { text: string, class: string }[] = []
+  if (!item) return badges
+  
+  const startDateStr = item.tanggal_mulai || item.tanggal
+  if (startDateStr && isToday(startDateStr)) {
+    let createdDateStr = ''
+    if (item.tanggal) {
+      createdDateStr = typeof item.tanggal === 'string' && item.tanggal.includes('T') ? item.tanggal.split('T')[0] : new Date(item.tanggal).toISOString().slice(0, 10)
+    }
+    let startIsoStr = typeof startDateStr === 'string' && startDateStr.includes('T') ? startDateStr.split('T')[0] : new Date(startDateStr).toISOString().slice(0, 10)
+    
+    if (startIsoStr && createdDateStr && startIsoStr > createdDateStr) {
+      badges.push({ text: '🔄 DITAYANGKAN KEMBALI HARI INI', class: 'bg-amber-500 text-white border-amber-400 animate-bounce shadow-lg' })
+    } else {
+      badges.push({ text: '🆕 BARU DITAYANGKAN HARI INI', class: 'bg-blue-600 text-white border-blue-500 animate-pulse shadow-lg' })
+    }
+  }
+  
+  return badges
 }
 
 onMounted(async () => {
