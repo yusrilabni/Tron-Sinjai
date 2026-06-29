@@ -1078,12 +1078,16 @@ const linkUrl = ref('')
 
 const calculateDurationFromDates = () => {
   if (caraDurasi.value === 'TANGGAL_AKHIR' && form.tanggal_mulai && tanggalAkhir.value) {
-    const start = new Date(form.tanggal_mulai)
-    const end = new Date(tanggalAkhir.value)
+    const parseLocalDate = (dateStr: string) => {
+      const parts = dateStr.split('-')
+      return new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10))
+    }
+    const start = parseLocalDate(form.tanggal_mulai)
+    const end = parseLocalDate(tanggalAkhir.value)
     const diffTime = end.getTime() - start.getTime()
-    const diffDays = Math.ceil(diffTime / (1000 * 3600 * 24))
-    if (diffDays > 0) {
-      form.durasi = diffDays
+    const diffDays = Math.round(diffTime / (1000 * 3600 * 24))
+    if (diffDays >= 0) {
+      form.durasi = diffDays + 1
       form.satuan = 'HARI'
     } else {
       form.durasi = 0
@@ -1292,12 +1296,16 @@ const updateTanggalAkhir = ref('')
 
 const calculateUpdateDurationFromDates = () => {
   if (updateCaraDurasi.value === 'TANGGAL_AKHIR' && updateForm.tanggal_mulai && updateTanggalAkhir.value) {
-    const start = new Date(updateForm.tanggal_mulai)
-    const end = new Date(updateTanggalAkhir.value)
+    const parseLocalDate = (dateStr: string) => {
+      const parts = dateStr.split('-')
+      return new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10))
+    }
+    const start = parseLocalDate(updateForm.tanggal_mulai)
+    const end = parseLocalDate(updateTanggalAkhir.value)
     const diffTime = end.getTime() - start.getTime()
-    const diffDays = Math.ceil(diffTime / (1000 * 3600 * 24))
+    const diffDays = Math.round(diffTime / (1000 * 3600 * 24))
     if (diffDays >= 0) {
-      updateForm.durasi = diffDays
+      updateForm.durasi = diffDays + 1
       updateForm.satuan = 'HARI'
     } else {
       updateForm.durasi = 0
@@ -1355,7 +1363,8 @@ const openAction = (item: any) => {
       if (updateForm.satuan === 'MINGGU') multiplier = 7
       if (updateForm.satuan === 'BULAN') multiplier = 30
       if (updateForm.satuan === 'TAHUN') multiplier = 365
-      const endDate = new Date(start.getTime() + (updateForm.durasi * multiplier * 24 * 60 * 60 * 1000))
+      const totalDays = updateForm.durasi * multiplier
+      const endDate = new Date(start.getTime() + ((totalDays - 1) * 24 * 60 * 60 * 1000))
       const tzOffset = endDate.getTimezoneOffset() * 60000
       updateTanggalAkhir.value = (new Date(endDate.getTime() - tzOffset)).toISOString().slice(0, 10)
     } catch(e) {
