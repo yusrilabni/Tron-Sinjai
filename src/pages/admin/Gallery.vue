@@ -76,7 +76,7 @@
                 
                 <div class="flex justify-end gap-2 pt-1">
                   <button @click="openManageGroup(group)" class="px-2.5 py-1 bg-white hover:bg-slate-900 hover:text-white border border-slate-200 rounded font-black text-[8px] uppercase tracking-widest transition-all">
-                    Urutkan / Kelola
+                    Urutkan / Kelola Grup
                   </button>
                 </div>
               </div>
@@ -396,8 +396,8 @@
                       </span>
                       <div class="flex gap-2">
                          <button @click="openManageGroup(item)" class="px-3 py-1.5 bg-white hover:bg-slate-900 hover:text-white border border-slate-200 rounded font-black text-[8px] uppercase tracking-widest transition-all">
-                            Kelola
-                         </button>
+                             Kelola Grup
+                          </button>
                          <button @click="handleDeleteGroupClick(item.id)" class="p-2 text-slate-400 hover:text-red-600 transition-colors" title="Hapus Grup">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                          </button>
@@ -492,9 +492,9 @@
                                 >
                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
                                 </button>
-                                <button v-if="child.source === 'SUBMISSION'" @click="openAction(child)" class="px-2 py-1 bg-slate-900 hover:bg-blue-700 text-white rounded font-black text-[8px] uppercase tracking-widest transition-all">
-                                   Kelola
-                                </button>
+                                <button @click="openAction(child)" class="px-2.5 py-1 bg-blue-700 hover:bg-slate-900 text-white rounded font-black text-[8px] uppercase tracking-widest transition-all flex items-center gap-1 shadow-sm">
+                                    ✏️ Edit
+                                 </button>
                                 <button @click="confirmDelete(child)" class="p-1 text-red-400 hover:text-red-600 transition-colors" title="Hapus">
                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                                 </button>
@@ -583,9 +583,9 @@
                             </span>
                          </div>
                          <div class="flex items-center gap-2">
-                            <button v-if="item.source === 'SUBMISSION'" @click="openAction(item)" class="px-3 py-1.5 bg-slate-900 hover:bg-blue-700 text-white rounded font-black text-[9px] uppercase tracking-widest transition-all">
-                               Kelola
-                            </button>
+                            <button @click="openAction(item)" class="px-3 py-1.5 bg-blue-700 hover:bg-slate-900 text-white rounded font-black text-[9px] uppercase tracking-widest transition-all flex items-center gap-1.5 shadow-sm">
+                                ✏️ Edit
+                             </button>
                             <button @click="confirmDelete(item)" class="p-1.5 text-red-400 hover:text-red-600 transition-colors" title="Hapus">
                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                             </button>
@@ -607,7 +607,9 @@
           
           <!-- Modal Header -->
           <div class="p-6 border-b-2 border-slate-100 flex justify-between items-center bg-slate-50 shrink-0">
-            <h3 class="font-black text-slate-900 uppercase tracking-tight text-sm">Manajemen Status</h3>
+            <h3 class="font-black text-slate-900 uppercase tracking-tight text-sm flex items-center gap-2">
+              <span>✏️</span> Edit Jadwal & Durasi Tayang Konten
+            </h3>
             <button @click="activeSub = null" class="text-slate-400 hover:text-slate-900 cursor-pointer">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
