@@ -178,6 +178,14 @@ Dokumen ini adalah rekaman lengkap mengenai seluruh fitur, penyelarasan algoritm
     *   Fungsi `handleUpdateStatus` menyimpan perubahan `durasi` (Kolom 13) dan `satuan` (Kolom 14) ke spreadsheet.
     *   Fungsi `handleGetGallery` mengembalikan data `durasi`, `satuan`, dan `catatan` pada setiap objek balasan.
 
+### 11. Visualisasi Catatan & Badge Status Penayangan di Beranda (`src/pages/Home.vue`)
+*   **Badge Penayangan Hari Ini**:
+    *   **`🆕 BARU DITAYANGKAN HARI INI`**: Ditampilkan otomatis pada kartu materi jika tanggal mulai tayang jatuh pada hari ini.
+    *   **`🔄 DITAYANGKAN KEMBALI HARI INI`**: Ditampilkan otomatis pada kartu materi jika materi tersebut diperpanjang atau ditayangkan kembali dari masa kedaluwarsa oleh admin pada hari ini.
+*   **Tampilan Catatan Admin**:
+    *   Setiap kartu yang memiliki catatan admin (`catatan`) akan menampilkan strip catatan bertuliskan **`📝 Catatan Admin: [Isi Catatan]`** secara jelas pada bagian bawah overlay kartu.
+    *   Jika materi diset kedaluwarsa manual oleh admin, catatan admin juga ditampilkan pada label status **`🔴 KADALUARSA`**.
+
 ---
 
 ## 4. Integrasi Git & Sinkronisasi Ulang (CLASP)
