@@ -915,6 +915,17 @@ function handleTelegramWebhook(data) {
           }
         };
 
+        const getMateriLink = function(url) {
+          if (!url) return '';
+          const urls = url.split('|');
+          if (urls.length === 1) {
+            return ` 🔗 [Lihat Konten](${urls[0]})`;
+          } else {
+            const links = urls.map((u, i) => `[Foto ${i + 1}](${u})`);
+            return ` 🔗 Lihat Konten: ${links.join(' | ')}`;
+          }
+        };
+
         let msg = `🖥️ *Daftar Materi Tayang Saat Ini*\n\n`;
 
         // Tampilkan individu
@@ -922,7 +933,8 @@ function handleTelegramWebhook(data) {
           individualItems.forEach((sub, idx) => {
             const isNew = checkIsNew(sub, todayStr, tz);
             const newLabel = isNew ? ` 🔴 *[KONTEN BARU]*` : ``;
-            msg += `${idx + 1}. \`${sub.no_registrasi}\`${newLabel}\n`;
+            const materiLink = getMateriLink(sub.url);
+            msg += `${idx + 1}. \`${sub.no_registrasi}\`${materiLink}${newLabel}\n`;
             msg += `   • *Instansi:* ${sub.instansi}\n`;
             msg += `   • *Judul:* ${sub.judul}\n`;
             msg += `   • *PIC:* ${sub.pic} (${sub.hp})\n`;
@@ -939,7 +951,8 @@ function handleTelegramWebhook(data) {
           gInfo.items.forEach((sub, sIdx) => {
             const isNew = checkIsNew(sub, todayStr, tz);
             const newLabel = isNew ? ` 🔴 *[KONTEN BARU]*` : ``;
-            msg += `${sIdx + 1}. \`${sub.no_registrasi}\`${newLabel}\n`;
+            const materiLink = getMateriLink(sub.url);
+            msg += `${sIdx + 1}. \`${sub.no_registrasi}\`${materiLink}${newLabel}\n`;
             msg += `   • *Instansi:* ${sub.instansi}\n`;
             msg += `   • *Judul:* ${sub.judul}\n`;
             msg += `   • *PIC:* ${sub.pic} (${sub.hp})\n`;
@@ -957,7 +970,8 @@ function handleTelegramWebhook(data) {
         if (pendingSubmissions.length > 0) {
           msg += `\n🔴 *Antrean Konten Baru (Belum Verifikasi) [${pendingSubmissions.length}]:*\n`;
           pendingSubmissions.forEach((sub, pIdx) => {
-            msg += `${pIdx + 1}. \`${sub.no_registrasi}\`\n`;
+            const materiLink = getMateriLink(sub.url);
+            msg += `${pIdx + 1}. \`${sub.no_registrasi}\`${materiLink}\n`;
             msg += `   • *Instansi:* ${sub.instansi}\n`;
             msg += `   • *Judul:* ${sub.judul}\n`;
             msg += `   • *PIC:* ${sub.pic} (${sub.hp})\n\n`;
@@ -968,7 +982,8 @@ function handleTelegramWebhook(data) {
         if (expiredSubmissions.length > 0) {
           msg += `\n🔴 *Materi Baru Kedaluwarsa (Expired) [${expiredSubmissions.length}]:*\n`;
           expiredSubmissions.forEach((sub, eIdx) => {
-            msg += `${eIdx + 1}. \`${sub.no_registrasi}\`\n`;
+            const materiLink = getMateriLink(sub.url);
+            msg += `${eIdx + 1}. \`${sub.no_registrasi}\`${materiLink}\n`;
             msg += `   • *Instansi:* ${sub.instansi}\n`;
             msg += `   • *Judul:* ${sub.judul}\n`;
             msg += `   • *PIC:* ${sub.pic} (${sub.hp})\n\n`;
