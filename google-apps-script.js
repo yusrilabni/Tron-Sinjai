@@ -1221,10 +1221,13 @@ function handleTelegramWebhook(data) {
           }
         }
 
+        const groupContentsCount = activeSubmissions.length - individualItems.length;
         msg += `━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
         msg += `📊 *STATISTIK PENAYANGAN*\n`;
         msg += `━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-        msg += `• *Total Konten:* ${activeSubmissions.length} konten\n`;
+        msg += `• *Total Konten Individu:* ${individualItems.length} konten\n`;
+        msg += `• *Total Konten Grup:* ${groupContentsCount} konten\n`;
+        msg += `• *Total Seluruh Konten:* ${activeSubmissions.length} konten\n`;
         msg += `• *Total Grup:* ${activeGroupCount} grup\n`;
 
         // Tampilkan Antrean Baru
