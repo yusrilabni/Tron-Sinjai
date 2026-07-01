@@ -838,6 +838,16 @@ function getRentangText(sub, timezone) {
   }
 }
 
+function escapeMarkdown(text) {
+  if (!text) return '';
+  return text.toString()
+             .replace(/_/g, '\\_')
+             .replace(/\*/g, '\\*')
+             .replace(/`/g, '\\`')
+             .replace(/\[/g, '\\[')
+             .replace(/]/g, '\\]');
+}
+
 function getSettingValue(key) {
   try {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -874,13 +884,14 @@ function setSettingValue(key, value) {
 
 function handleTelegramWebhook(data) {
   try {
+    writeLog("TELEGRAM_BOT", "WEBHOOK_RECEIVED", JSON.stringify(data));
     // 1. Tangani Callback Query (Klik tombol stop inline)
     if (data.callback_query) {
       const callbackQuery = data.callback_query;
       const callbackData = callbackQuery.data;
       const chat_id = callbackQuery.message.chat.id.toString();
 
-      if (chat_id !== CONFIG.TELEGRAM.CHAT_ID) {
+      if (chat_id !== CONFIG.TELEGRAM.CHAT_ID && chat_id !== '5084316077') {
         return response({ success: true });
       }
 
@@ -1035,8 +1046,9 @@ function handleTelegramWebhook(data) {
     const text = data.message.text.trim();
     const chat_id = data.message.chat.id.toString();
 
-    // Pastikan chat_id berasal dari grup admin yang dikonfigurasi
-    if (chat_id !== CONFIG.TELEGRAM.CHAT_ID) {
+    // Pastikan chat_id berasal dari grup admin yang dikonfigurasi atau chat ID pribadi admin
+    const allowedChats = [CONFIG.TELEGRAM.CHAT_ID, '5084316077'];
+    if (allowedChats.indexOf(chat_id) === -1) {
       return response({ success: true });
     }
 
@@ -1087,11 +1099,21 @@ function handleTelegramWebhook(data) {
         const tz = SpreadsheetApp.getActiveSpreadsheet().getSpreadsheetTimeZone() || "GMT+7";
         const todayStr = Utilities.formatDate(new Date(), tz, "yyyy-MM-dd");
 
+        const getTanggalTime = function(sub) {
+          try {
+            if (!sub.tanggal) return 0;
+            const parsed = safeParseDate(sub.tanggal);
+            return parsed ? parsed.getTime() : 0;
+          } catch(e) {
+            return 0;
+          }
+        };
+
         const submissions = getAllSubmissionData();
         const activeSubmissions = submissions.filter(sub => sub.status === 'TAYANG');
         const pendingSubmissions = submissions.filter(sub => sub.status === 'MENUNGGU_VERIFIKASI');
         const expiredSubmissions = submissions.filter(sub => checkExpiredToday(sub, todayStr, tz))
-                                              .sort((a,b) => new Date(b.tanggal).getTime() - new Date(a.tanggal).getTime());
+                                              .sort((a,b) => getTanggalTime(b) - getTanggalTime(a));
 
         const groups = getAllGroups().filter(g => g.status === 'ACTIVE');
         
@@ -1162,11 +1184,11 @@ function handleTelegramWebhook(data) {
             const materiLink = getMateriLink(sub.url);
             const rentangText = getRentangText(sub, tz);
             msg += `${idx + 1}. 🆔 \`${sub.no_registrasi}\`${newLabel}\n`;
-            msg += `   • *Instansi:* ${sub.instansi}\n`;
-            msg += `   • *Judul:* ${sub.judul}\n`;
+            msg += `   • *Instansi:* ${escapeMarkdown(sub.instansi)}\n`;
+            msg += `   • *Judul:* ${escapeMarkdown(sub.judul)}\n`;
             msg += rentangText;
             msg += `   • *Sisa Hari:* ${sub.sisa_hari} hari\n`;
-            msg += `   • *PIC:* ${sub.pic} (${sub.hp})\n`;
+            msg += `   • *PIC:* ${escapeMarkdown(sub.pic)} (${escapeMarkdown(sub.hp)})\n`;
             msg += `   • *Materi:* 🔗 ${materiLink}\n\n`;
           });
         }
@@ -1180,7 +1202,7 @@ function handleTelegramWebhook(data) {
           for (const groupId in groupItemsMap) {
             const gInfo = groupItemsMap[groupId];
             activeGroupCount++;
-            msg += `👥 *GRUP ${gInfo.group.nama.toUpperCase()} : ${gInfo.group.id}*\n`;
+            msg += `👥 *GRUP ${(gInfo.group.nama || '').toUpperCase()} : ${gInfo.group.id}*\n`;
             msg += `──────────────────────────\n`;
             gInfo.items.forEach((sub, sIdx) => {
               const isNew = checkIsNew(sub, todayStr, tz);
@@ -1188,11 +1210,11 @@ function handleTelegramWebhook(data) {
               const materiLink = getMateriLink(sub.url);
               const rentangText = getRentangText(sub, tz);
               msg += `${sIdx + 1}. 🆔 \`${sub.no_registrasi}\`${newLabel}\n`;
-              msg += `   • *Instansi:* ${sub.instansi}\n`;
-              msg += `   • *Judul:* ${sub.judul}\n`;
+              msg += `   • *Instansi:* ${escapeMarkdown(sub.instansi)}\n`;
+              msg += `   • *Judul:* ${escapeMarkdown(sub.judul)}\n`;
               msg += rentangText;
               msg += `   • *Sisa Hari:* ${sub.sisa_hari} hari\n`;
-              msg += `   • *PIC:* ${sub.pic} (${sub.hp})\n`;
+              msg += `   • *PIC:* ${escapeMarkdown(sub.pic)} (${escapeMarkdown(sub.hp)})\n`;
               msg += `   • *Materi:* 🔗 ${materiLink}\n`;
             });
             msg += `\n`;
@@ -1214,10 +1236,10 @@ function handleTelegramWebhook(data) {
             const materiLink = getMateriLink(sub.url);
             const rentangText = getRentangText(sub, tz);
             msg += `${pIdx + 1}. 🆔 \`${sub.no_registrasi}\`\n`;
-            msg += `   • *Instansi:* ${sub.instansi}\n`;
-            msg += `   • *Judul:* ${sub.judul}\n`;
+            msg += `   • *Instansi:* ${escapeMarkdown(sub.instansi)}\n`;
+            msg += `   • *Judul:* ${escapeMarkdown(sub.judul)}\n`;
             msg += rentangText;
-            msg += `   • *PIC:* ${sub.pic} (${sub.hp})\n`;
+            msg += `   • *PIC:* ${escapeMarkdown(sub.pic)} (${escapeMarkdown(sub.hp)})\n`;
             msg += `   • *Materi:* 🔗 ${materiLink}\n\n`;
           });
         }
@@ -1231,10 +1253,10 @@ function handleTelegramWebhook(data) {
             const materiLink = getMateriLink(sub.url);
             const rentangText = getRentangText(sub, tz);
             msg += `${eIdx + 1}. 🆔 \`${sub.no_registrasi}\`\n`;
-            msg += `   • *Instansi:* ${sub.instansi}\n`;
-            msg += `   • *Judul:* ${sub.judul}\n`;
+            msg += `   • *Instansi:* ${escapeMarkdown(sub.instansi)}\n`;
+            msg += `   • *Judul:* ${escapeMarkdown(sub.judul)}\n`;
             msg += rentangText;
-            msg += `   • *PIC:* ${sub.pic} (${sub.hp})\n`;
+            msg += `   • *PIC:* ${escapeMarkdown(sub.pic)} (${escapeMarkdown(sub.hp)})\n`;
             msg += `   • *Materi:* 🔗 ${materiLink}\n\n`;
           });
         }
@@ -1301,7 +1323,7 @@ function cronTwoHoursCheck() {
 
     msg += `⏳ *Sudah Kedaluwarsa Hari Ini (${expiredItems.length}):*\n`;
     expiredItems.forEach(item => {
-      msg += `• \`${item.no_registrasi}\` - ${item.instansi} (${item.judul})\n`;
+      msg += `• \`${item.no_registrasi}\` - ${escapeMarkdown(item.instansi)} (${escapeMarkdown(item.judul)})\n`;
       const rentangText = getRentangText(item, tz);
       if (rentangText) {
         msg += rentangText.replace(/   /g, '  ');
