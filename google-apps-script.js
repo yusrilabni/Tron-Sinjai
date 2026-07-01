@@ -895,6 +895,22 @@ function handleTelegramWebhook(data) {
       } catch (listErr) {
         sendTelegram(`❌ Gagal mengambil daftar materi: ${listErr.toString()}`);
       }
+    } else if (text.startsWith('/info')) {
+      const msg = `🤖 *Panduan Perintah Bot Telegram Admin*\n\n` +
+                  `Berikut adalah daftar perintah yang dapat digunakan di grup ini:\n\n` +
+                  `1. 🖥️ \`/list\`\n` +
+                  `   • *Kegunaan:* Menampilkan seluruh daftar materi videotron yang sedang aktif/tayang saat ini.\n` +
+                  `   • *Detail:* Memisahkan label konten Mandiri vs Album, serta menampilkan total statistik.\n\n` +
+                  `2. ⏰ \`/stop [ID_Registrasi]\`\n` +
+                  `   • *Kegunaan:* Mematikan pengingat berkala (setiap 2 jam) khusus untuk ID berkas tersebut.\n` +
+                  `   • *Contoh:* \`/stop TRON-20260701-1234\`\n\n` +
+                  `3. ❌ \`/stop\`\n` +
+                  `   • *Kegunaan:* Menonaktifkan seluruh notifikasi sistem ke Telegram secara penuh.\n\n` +
+                  `4. ✅ \`/start\`\n` +
+                  `   • *Kegunaan:* Mengaktifkan kembali seluruh notifikasi sistem ke Telegram.\n\n` +
+                  `5. ℹ️ \`/info\`\n` +
+                  `   • *Kegunaan:* Menampilkan menu panduan perintah ini.`;
+      sendTelegram(msg);
     }
   } catch (err) {
     console.error("Webhook Error: " + err.toString());
