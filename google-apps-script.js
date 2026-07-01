@@ -813,7 +813,7 @@ function getRentangText(sub, timezone) {
     const end = new Date(parsedStart.getTime() + (durasi * multiplier * 24 * 60 * 60 * 1000));
     const endStr = Utilities.formatDate(end, timezone, "dd-MM-yyyy");
     
-    return `   • *Rentang:* ${startStr} s/d ${endStr}\n   • *Ditetapkan Expire:* ${endStr}\n`;
+    return `   • *Rentang:* ${startStr} s/d ${endStr}\n   • *Expire:* ${endStr}\n`;
   } catch(e) {
     return '';
   }
@@ -1023,87 +1023,103 @@ function handleTelegramWebhook(data) {
         };
 
         const getMateriLink = function(url) {
-          if (!url) return '';
+          if (!url) return 'Tidak ada tautan';
           const urls = url.split('|');
           if (urls.length === 1) {
-            return ` 🔗 [Lihat Konten](${urls[0]})`;
+            return `[Lihat Konten](${urls[0]})`;
           } else {
             const links = urls.map((u, i) => `[Foto ${i + 1}](${u})`);
-            return ` 🔗 Lihat Konten: ${links.join(' | ')}`;
+            return links.join(' | ');
           }
         };
 
-        let msg = `🖥️ *Daftar Materi Tayang Saat Ini*\n\n`;
+        let msg = `🖥️ *DAFTAR MATERI TAYANG*\n\n`;
 
         // Tampilkan individu
         if (individualItems.length > 0) {
+          msg += `━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+          msg += `*A. KATEGORI INDIVIDU*\n`;
+          msg += `━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
           individualItems.forEach((sub, idx) => {
             const isNew = checkIsNew(sub, todayStr, tz);
             const newLabel = isNew ? ` 🔴 *[KONTEN BARU]*` : ``;
             const materiLink = getMateriLink(sub.url);
             const rentangText = getRentangText(sub, tz);
-            msg += `${idx + 1}. \`${sub.no_registrasi}\`${materiLink}${newLabel}\n`;
+            msg += `${idx + 1}. 🆔 \`${sub.no_registrasi}\`${newLabel}\n`;
             msg += `   • *Instansi:* ${sub.instansi}\n`;
             msg += `   • *Judul:* ${sub.judul}\n`;
-            msg += `   • *PIC:* ${sub.pic} (${sub.hp})\n`;
             msg += rentangText;
-            msg += `   • *Sisa Hari:* ${sub.sisa_hari} hari\n\n`;
+            msg += `   • *Sisa Hari:* ${sub.sisa_hari} hari\n`;
+            msg += `   • *PIC:* ${sub.pic} (${sub.hp})\n`;
+            msg += `   • *Materi:* 🔗 ${materiLink}\n\n`;
           });
         }
 
         // Tampilkan grup
         let activeGroupCount = 0;
-        for (const groupId in groupItemsMap) {
-          const gInfo = groupItemsMap[groupId];
-          activeGroupCount++;
-          msg += `👥 *GRUP ${gInfo.group.nama.toUpperCase()} : ${gInfo.group.id}*\n`;
-          gInfo.items.forEach((sub, sIdx) => {
-            const isNew = checkIsNew(sub, todayStr, tz);
-            const newLabel = isNew ? ` 🔴 *[KONTEN BARU]*` : ``;
-            const materiLink = getMateriLink(sub.url);
-            const rentangText = getRentangText(sub, tz);
-            msg += `${sIdx + 1}. \`${sub.no_registrasi}\`${materiLink}${newLabel}\n`;
-            msg += `   • *Instansi:* ${sub.instansi}\n`;
-            msg += `   • *Judul:* ${sub.judul}\n`;
-            msg += `   • *PIC:* ${sub.pic} (${sub.hp})\n`;
-            msg += rentangText;
-            msg += `   • *Sisa Hari:* ${sub.sisa_hari} hari\n`;
-          });
-          msg += `\n`;
+        if (Object.keys(groupItemsMap).length > 0) {
+          msg += `━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+          msg += `*B. KATEGORI GRUP*\n`;
+          msg += `━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+          for (const groupId in groupItemsMap) {
+            const gInfo = groupItemsMap[groupId];
+            activeGroupCount++;
+            msg += `👥 *GRUP ${gInfo.group.nama.toUpperCase()} : ${gInfo.group.id}*\n`;
+            msg += `──────────────────────────\n`;
+            gInfo.items.forEach((sub, sIdx) => {
+              const isNew = checkIsNew(sub, todayStr, tz);
+              const newLabel = isNew ? ` 🔴 *[KONTEN BARU]*` : ``;
+              const materiLink = getMateriLink(sub.url);
+              const rentangText = getRentangText(sub, tz);
+              msg += `${sIdx + 1}. 🆔 \`${sub.no_registrasi}\`${newLabel}\n`;
+              msg += `   • *Instansi:* ${sub.instansi}\n`;
+              msg += `   • *Judul:* ${sub.judul}\n`;
+              msg += rentangText;
+              msg += `   • *Sisa Hari:* ${sub.sisa_hari} hari\n`;
+              msg += `   • *PIC:* ${sub.pic} (${sub.hp})\n`;
+              msg += `   • *Materi:* 🔗 ${materiLink}\n`;
+            });
+            msg += `\n`;
+          }
         }
 
-        msg += `--------------------------------------\n`;
-        msg += `📊 *Statistik Penayangan:*\n`;
+        msg += `━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+        msg += `📊 *STATISTIK PENAYANGAN*\n`;
+        msg += `━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
         msg += `• *Total Konten:* ${activeSubmissions.length} konten\n`;
         msg += `• *Total Grup:* ${activeGroupCount} grup\n`;
 
         // Tampilkan Antrean Baru
         if (pendingSubmissions.length > 0) {
-          msg += `\n🔴 *Antrean Konten Baru (Belum Verifikasi) [${pendingSubmissions.length}]:*\n`;
+          msg += `\n━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+          msg += `🔴 *ANTREAN BELUM VERIFIKASI [${pendingSubmissions.length}]*\n`;
+          msg += `━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
           pendingSubmissions.forEach((sub, pIdx) => {
             const materiLink = getMateriLink(sub.url);
             const rentangText = getRentangText(sub, tz);
-            msg += `${pIdx + 1}. \`${sub.no_registrasi}\`${materiLink}\n`;
+            msg += `${pIdx + 1}. 🆔 \`${sub.no_registrasi}\`\n`;
             msg += `   • *Instansi:* ${sub.instansi}\n`;
             msg += `   • *Judul:* ${sub.judul}\n`;
-            msg += `   • *PIC:* ${sub.pic} (${sub.hp})\n`;
             msg += rentangText;
-            msg += `\n`;
+            msg += `   • *PIC:* ${sub.pic} (${sub.hp})\n`;
+            msg += `   • *Materi:* 🔗 ${materiLink}\n\n`;
           });
         }
 
         // Tampilkan Kadaluarsa
         if (expiredSubmissions.length > 0) {
-          msg += `\n🔴 *Materi Baru Kedaluwarsa (Expired) [${expiredSubmissions.length}]:*\n`;
+          msg += `\n━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+          msg += `🔴 *KEDALUWARSA HARI INI [${expiredSubmissions.length}]*\n`;
+          msg += `━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
           expiredSubmissions.forEach((sub, eIdx) => {
             const materiLink = getMateriLink(sub.url);
             const rentangText = getRentangText(sub, tz);
-            msg += `${eIdx + 1}. \`${sub.no_registrasi}\`${materiLink}\n`;
+            msg += `${eIdx + 1}. 🆔 \`${sub.no_registrasi}\`\n`;
             msg += `   • *Instansi:* ${sub.instansi}\n`;
             msg += `   • *Judul:* ${sub.judul}\n`;
-            msg += `   • *PIC:* ${sub.pic} (${sub.hp})\n`;
             msg += rentangText;
-            msg += `\n`;
+            msg += `   • *PIC:* ${sub.pic} (${sub.hp})\n`;
+            msg += `   • *Materi:* 🔗 ${materiLink}\n\n`;
           });
         }
 
