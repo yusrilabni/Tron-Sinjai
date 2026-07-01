@@ -862,11 +862,10 @@ function handleTelegramWebhook(data) {
       try {
         const submissions = getAllSubmissionData();
         const activeSubmissions = submissions.filter(sub => sub.status === 'TAYANG');
-        
-        if (activeSubmissions.length === 0) {
-          sendTelegram(`🖥️ *Materi Tayang Saat Ini*\n\nTidak ada materi yang sedang ditayangkan.`);
-          return response({ success: true });
-        }
+        const pendingSubmissions = submissions.filter(sub => sub.status === 'MENUNGGU_VERIFIKASI');
+        const expiredSubmissions = submissions.filter(sub => sub.status === 'EXPIRED')
+                                              .sort((a,b) => new Date(b.tanggal).getTime() - new Date(a.tanggal).getTime())
+                                              .slice(0, 5); // Limit 5 kadaluarsa terbaru
 
         const groups = getAllGroups().filter(g => g.status === 'ACTIVE');
         
@@ -897,12 +896,33 @@ function handleTelegramWebhook(data) {
           }
         });
 
+        const tz = SpreadsheetApp.getActiveSpreadsheet().getSpreadsheetTimeZone() || "GMT+7";
+        const todayStr = Utilities.formatDate(new Date(), tz, "yyyy-MM-dd");
+
+        const checkIsNew = function(sub, today, timezone) {
+          try {
+            const subDate = sub.tanggal ? Utilities.formatDate(new Date(sub.tanggal), timezone, "yyyy-MM-dd") : "";
+            let start = "";
+            if (sub.tanggal_mulai) {
+              const parsedStart = safeParseDate(sub.tanggal_mulai);
+              if (parsedStart) {
+                start = Utilities.formatDate(parsedStart, timezone, "yyyy-MM-dd");
+              }
+            }
+            return (subDate === today || start === today);
+          } catch(e) {
+            return false;
+          }
+        };
+
         let msg = `🖥️ *Daftar Materi Tayang Saat Ini*\n\n`;
 
         // Tampilkan individu
         if (individualItems.length > 0) {
           individualItems.forEach((sub, idx) => {
-            msg += `${idx + 1}. \`${sub.no_registrasi}\`\n`;
+            const isNew = checkIsNew(sub, todayStr, tz);
+            const newLabel = isNew ? ` 🔴 *[KONTEN BARU]*` : ``;
+            msg += `${idx + 1}. \`${sub.no_registrasi}\`${newLabel}\n`;
             msg += `   • *Instansi:* ${sub.instansi}\n`;
             msg += `   • *Judul:* ${sub.judul}\n`;
             msg += `   • *PIC:* ${sub.pic} (${sub.hp})\n`;
@@ -917,7 +937,9 @@ function handleTelegramWebhook(data) {
           activeGroupCount++;
           msg += `👥 *GRUP ${gInfo.group.nama.toUpperCase()} : ${gInfo.group.id}*\n`;
           gInfo.items.forEach((sub, sIdx) => {
-            msg += `${sIdx + 1}. \`${sub.no_registrasi}\`\n`;
+            const isNew = checkIsNew(sub, todayStr, tz);
+            const newLabel = isNew ? ` 🔴 *[KONTEN BARU]*` : ``;
+            msg += `${sIdx + 1}. \`${sub.no_registrasi}\`${newLabel}\n`;
             msg += `   • *Instansi:* ${sub.instansi}\n`;
             msg += `   • *Judul:* ${sub.judul}\n`;
             msg += `   • *PIC:* ${sub.pic} (${sub.hp})\n`;
@@ -929,7 +951,29 @@ function handleTelegramWebhook(data) {
         msg += `--------------------------------------\n`;
         msg += `📊 *Statistik Penayangan:*\n`;
         msg += `• *Total Konten:* ${activeSubmissions.length} konten\n`;
-        msg += `• *Total Grup:* ${activeGroupCount} grup`;
+        msg += `• *Total Grup:* ${activeGroupCount} grup\n`;
+
+        // Tampilkan Antrean Baru
+        if (pendingSubmissions.length > 0) {
+          msg += `\n🔴 *Antrean Konten Baru (Belum Verifikasi) [${pendingSubmissions.length}]:*\n`;
+          pendingSubmissions.forEach((sub, pIdx) => {
+            msg += `${pIdx + 1}. \`${sub.no_registrasi}\`\n`;
+            msg += `   • *Instansi:* ${sub.instansi}\n`;
+            msg += `   • *Judul:* ${sub.judul}\n`;
+            msg += `   • *PIC:* ${sub.pic} (${sub.hp})\n\n`;
+          });
+        }
+
+        // Tampilkan Kadaluarsa
+        if (expiredSubmissions.length > 0) {
+          msg += `\n🔴 *Materi Baru Kedaluwarsa (Expired) [${expiredSubmissions.length}]:*\n`;
+          expiredSubmissions.forEach((sub, eIdx) => {
+            msg += `${eIdx + 1}. \`${sub.no_registrasi}\`\n`;
+            msg += `   • *Instansi:* ${sub.instansi}\n`;
+            msg += `   • *Judul:* ${sub.judul}\n`;
+            msg += `   • *PIC:* ${sub.pic} (${sub.hp})\n\n`;
+          });
+        }
 
         sendTelegram(msg);
       } catch (listErr) {
