@@ -1284,6 +1284,9 @@ function handleTelegramWebhook(data) {
     }
   } catch (err) {
     console.error("Webhook Error: " + err.toString());
+    try {
+      sendTelegram(`❌ *Sistem Bot mengalami kendala:* \n\`${err.toString()}\``);
+    } catch(e) {}
   }
   return HtmlService.createHtmlOutput("ok");
 }
