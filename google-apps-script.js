@@ -558,7 +558,26 @@ function handlePengajuan(payload) {
                   `*Tanggal Mulai:* ${payload.tanggal_mulai}\n` +
                   `*Biaya:* Rp ${formatBiaya}\n\n` +
                   `Silakan lakukan verifikasi pada dashboard admin.`;
-      sendTelegram(msg);
+
+      if (!payload.status) {
+        // Pendaftaran Baru -> Buat token verifikasi 1 kali klik via Telegram
+        const token = Math.random().toString(36).substr(2, 8).toUpperCase();
+        try {
+          PropertiesService.getScriptProperties().setProperty('TG_TOKEN_' + noReg, token);
+        } catch(e) {}
+
+        const replyMarkup = {
+          inline_keyboard: [
+            [
+              { text: '✅ Setujui', callback_data: `approve_${noReg}_${token}` },
+              { text: '❌ Tolak', callback_data: `reject_${noReg}_${token}` }
+            ]
+          ]
+        };
+        sendTelegram(msg, replyMarkup);
+      } else {
+        sendTelegram(msg);
+      }
     } catch (telegramErr) {}
 
     return response({ success: true, no_registrasi: noReg, total_biaya: biayaTotal });
@@ -910,6 +929,103 @@ function handleTelegramWebhook(data) {
             muteHttpExceptions: true
           });
         } catch(e) {}
+      } else if (callbackData.startsWith('approve_') || callbackData.startsWith('reject_')) {
+        const parts = callbackData.split('_');
+        const action = parts[0];
+        const noReg = parts[1];
+        const token = parts[2];
+
+        // Verifikasi token
+        const propService = PropertiesService.getScriptProperties();
+        const savedToken = propService.getProperty('TG_TOKEN_' + noReg);
+
+        if (!savedToken || savedToken !== token) {
+          try {
+            const answerUrl = `https://api.telegram.org/bot${CONFIG.TELEGRAM.TOKEN}/answerCallbackQuery`;
+            UrlFetchApp.fetch(answerUrl, {
+              method: 'post',
+              contentType: 'application/json',
+              payload: JSON.stringify({
+                callback_query_id: callbackQuery.id,
+                text: `❌ Tindakan ditolak: Token tidak valid atau tombol sudah diklik sebelumnya.`,
+                show_alert: true
+              }),
+              muteHttpExceptions: true
+            });
+          } catch(e) {}
+          return HtmlService.createHtmlOutput("ok");
+        }
+
+        // Hapus token agar hanya bisa diklik 1 kali saja
+        propService.deleteProperty('TG_TOKEN_' + noReg);
+
+        // Lakukan perubahan status di Spreadsheet
+        const newStatus = action === 'approve' ? 'DISETUJUI' : 'DITOLAK';
+        const payload = {
+          no_registrasi: noReg,
+          status: newStatus,
+          catatan: action === 'approve' ? 'Disetujui via Telegram (One-click)' : 'Ditolak via Telegram (One-click)',
+          allow_edit: false
+        };
+        const updatedRes = handleUpdateStatus(payload, 'TELEGRAM_BOT');
+        let isSuccess = false;
+        try {
+          const jsonStr = updatedRes.getContent();
+          isSuccess = JSON.parse(jsonStr).success;
+        } catch(e) {
+          isSuccess = (updatedRes && updatedRes.success);
+        }
+
+        if (isSuccess) {
+          // Edit pesan asli untuk menghapus button dan merubah teks status
+          const originalText = callbackQuery.message.text || '';
+          const updatedText = originalText + `\n\n⚡ *Tindakan via Telegram:* Berkas ini telah *${newStatus}* oleh admin.`;
+          
+          try {
+            const editUrl = `https://api.telegram.org/bot${CONFIG.TELEGRAM.TOKEN}/editMessageText`;
+            UrlFetchApp.fetch(editUrl, {
+              method: 'post',
+              contentType: 'application/json',
+              payload: JSON.stringify({
+                chat_id: chat_id,
+                message_id: callbackQuery.message.message_id,
+                text: updatedText,
+                parse_mode: 'Markdown',
+                reply_markup: { inline_keyboard: [] }
+              }),
+              muteHttpExceptions: true
+            });
+          } catch(e) {}
+
+          // Jawab callback query
+          try {
+            const answerUrl = `https://api.telegram.org/bot${CONFIG.TELEGRAM.TOKEN}/answerCallbackQuery`;
+            UrlFetchApp.fetch(answerUrl, {
+              method: 'post',
+              contentType: 'application/json',
+              payload: JSON.stringify({
+                callback_query_id: callbackQuery.id,
+                text: `Berhasil: Berkas ${newStatus}!`,
+                show_alert: false
+              }),
+              muteHttpExceptions: true
+            });
+          } catch(e) {}
+        } else {
+          try {
+            const answerUrl = `https://api.telegram.org/bot${CONFIG.TELEGRAM.TOKEN}/answerCallbackQuery`;
+            UrlFetchApp.fetch(answerUrl, {
+              method: 'post',
+              contentType: 'application/json',
+              payload: JSON.stringify({
+                callback_query_id: callbackQuery.id,
+                text: `❌ Gagal mengubah status di Spreadsheet.`,
+                show_alert: true
+              }),
+              muteHttpExceptions: true
+            });
+          } catch(e) {}
+        }
       }
       return HtmlService.createHtmlOutput("ok");
     }
