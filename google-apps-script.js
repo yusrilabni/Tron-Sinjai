@@ -750,7 +750,7 @@ function generateNoReg() {
   return `TRON-${dateStr}-${Math.floor(Math.random() * 9000) + 1000}`;
 }
 
-function sendTelegram(msg) {
+function sendTelegram(msg, replyMarkup) {
   try {
     if (!CONFIG.TELEGRAM.TOKEN || CONFIG.TELEGRAM.TOKEN === 'PASTE_TOKEN_BOT_TELEGRAM_DISINI' || 
         !CONFIG.TELEGRAM.CHAT_ID || CONFIG.TELEGRAM.CHAT_ID === 'PASTE_CHAT_ID_ADMIN_DISINI') {
@@ -767,8 +767,35 @@ function sendTelegram(msg) {
     }
 
     const url = `https://api.telegram.org/bot${CONFIG.TELEGRAM.TOKEN}/sendMessage`;
-    UrlFetchApp.fetch(url, { method: 'post', contentType: 'application/json', payload: JSON.stringify({ chat_id: CONFIG.TELEGRAM.CHAT_ID, text: msg, parse_mode: 'Markdown' }), muteHttpExceptions: true });
+    const payload = {
+      chat_id: CONFIG.TELEGRAM.CHAT_ID,
+      text: msg,
+      parse_mode: 'Markdown'
+    };
+    if (replyMarkup) {
+      payload.reply_markup = replyMarkup;
+    }
+    UrlFetchApp.fetch(url, { method: 'post', contentType: 'application/json', payload: JSON.stringify(payload), muteHttpExceptions: true });
   } catch (e) {}
+}
+
+function checkExpiredToday(sub, today, timezone) {
+  try {
+    if (sub.status !== 'EXPIRED') return false;
+    if (!sub.tanggal_mulai) return false;
+    const parsedStart = safeParseDate(sub.tanggal_mulai);
+    if (!parsedStart) return false;
+    let multiplier = 1;
+    if (sub.satuan === 'MINGGU') multiplier = 7;
+    if (sub.satuan === 'BULAN') multiplier = 30;
+    if (sub.satuan === 'TAHUN') multiplier = 365;
+    const durasi = parseInt(sub.durasi) || 0;
+    const end = new Date(parsedStart.getTime() + (durasi * multiplier * 24 * 60 * 60 * 1000));
+    const endStr = Utilities.formatDate(end, timezone, "yyyy-MM-dd");
+    return endStr === today;
+  } catch(e) {
+    return false;
+  }
 }
 
 function getSettingValue(key) {
@@ -807,6 +834,66 @@ function setSettingValue(key, value) {
 
 function handleTelegramWebhook(data) {
   try {
+    // 1. Tangani Callback Query (Klik tombol stop inline)
+    if (data.callback_query) {
+      const callbackQuery = data.callback_query;
+      const callbackData = callbackQuery.data;
+      const chat_id = callbackQuery.message.chat.id.toString();
+
+      if (chat_id !== CONFIG.TELEGRAM.CHAT_ID) {
+        return response({ success: true });
+      }
+
+      if (callbackData.startsWith('stop_')) {
+        const noReg = callbackData.replace('stop_', '').toUpperCase().trim();
+        const ss = SpreadsheetApp.getActiveSpreadsheet();
+        let settingsSheet = ss.getSheetByName('Settings');
+        if (!settingsSheet) {
+          settingsSheet = ss.insertSheet('Settings');
+          settingsSheet.appendRow(["Key", "Value", "Description"]);
+        }
+        let stoppedList = [];
+        let stoppedRowIdx = -1;
+        const settingsData = settingsSheet.getDataRange().getValues();
+        for (let i = 1; i < settingsData.length; i++) {
+          if (settingsData[i][0] === 'TELEGRAM_STOPPED_IDS') {
+            try {
+              stoppedList = JSON.parse(settingsData[i][1] || '[]');
+            } catch(e) {
+              stoppedList = [];
+            }
+            stoppedRowIdx = i + 1;
+            break;
+          }
+        }
+        if (stoppedRowIdx === -1) {
+          settingsSheet.appendRow(['TELEGRAM_STOPPED_IDS', JSON.stringify([noReg]), 'Daftar ID Pengajuan yang dihentikan notifikasinya']);
+        } else {
+          if (stoppedList.indexOf(noReg) === -1) {
+            stoppedList.push(noReg);
+          }
+          settingsSheet.getRange(stoppedRowIdx, 2).setValue(JSON.stringify(stoppedList));
+        }
+
+        sendTelegram(`✅ Notifikasi pengingat untuk ID \`${noReg}\` telah dinonaktifkan.`);
+
+        try {
+          const answerUrl = `https://api.telegram.org/bot${CONFIG.TELEGRAM.TOKEN}/answerCallbackQuery`;
+          UrlFetchApp.fetch(answerUrl, {
+            method: 'post',
+            contentType: 'application/json',
+            payload: JSON.stringify({
+              callback_query_id: callbackQuery.id,
+              text: `Pengingat ${noReg} dinonaktifkan.`
+            }),
+            muteHttpExceptions: true
+          });
+        } catch(e) {}
+      }
+      return HtmlService.createHtmlOutput("ok");
+    }
+
+    // 2. Tangani Pesan Teks Biasa
     if (!data.message || !data.message.text) return response({ success: true });
     const text = data.message.text.trim();
     const chat_id = data.message.chat.id.toString();
@@ -860,12 +947,14 @@ function handleTelegramWebhook(data) {
       sendTelegram(`✅ Seluruh notifikasi Telegram telah diaktifkan kembali.`);
     } else if (text.startsWith('/list')) {
       try {
+        const tz = SpreadsheetApp.getActiveSpreadsheet().getSpreadsheetTimeZone() || "GMT+7";
+        const todayStr = Utilities.formatDate(new Date(), tz, "yyyy-MM-dd");
+
         const submissions = getAllSubmissionData();
         const activeSubmissions = submissions.filter(sub => sub.status === 'TAYANG');
         const pendingSubmissions = submissions.filter(sub => sub.status === 'MENUNGGU_VERIFIKASI');
-        const expiredSubmissions = submissions.filter(sub => sub.status === 'EXPIRED')
-                                              .sort((a,b) => new Date(b.tanggal).getTime() - new Date(a.tanggal).getTime())
-                                              .slice(0, 5); // Limit 5 kadaluarsa terbaru
+        const expiredSubmissions = submissions.filter(sub => checkExpiredToday(sub, todayStr, tz))
+                                              .sort((a,b) => new Date(b.tanggal).getTime() - new Date(a.tanggal).getTime());
 
         const groups = getAllGroups().filter(g => g.status === 'ACTIVE');
         
@@ -895,9 +984,6 @@ function handleTelegramWebhook(data) {
             individualItems.push(sub);
           }
         });
-
-        const tz = SpreadsheetApp.getActiveSpreadsheet().getSpreadsheetTimeZone() || "GMT+7";
-        const todayStr = Utilities.formatDate(new Date(), tz, "yyyy-MM-dd");
 
         const checkIsNew = function(sub, today, timezone) {
           try {
@@ -1028,6 +1114,9 @@ function cronTwoHoursCheck() {
       stoppedIds = JSON.parse(getSettingValue('TELEGRAM_STOPPED_IDS') || '[]');
     } catch(e) {}
 
+    const tz = SpreadsheetApp.getActiveSpreadsheet().getSpreadsheetTimeZone() || "GMT+7";
+    const todayStr = Utilities.formatDate(new Date(), tz, "yyyy-MM-dd");
+
     const submissions = getAllSubmissionData();
     const pendingItems = [];
     const expiredItems = [];
@@ -1038,7 +1127,7 @@ function cronTwoHoursCheck() {
 
       if (sub.status === 'MENUNGGU_VERIFIKASI') {
         pendingItems.push(sub);
-      } else if (sub.status === 'EXPIRED') {
+      } else if (checkExpiredToday(sub, todayStr, tz)) {
         expiredItems.push(sub);
       }
     });
@@ -1048,26 +1137,36 @@ function cronTwoHoursCheck() {
     }
 
     let msg = `⏰ *Pengingat Berkala (Setiap 2 Jam)*\n\n`;
+    const keyboard = [];
 
     if (pendingItems.length > 0) {
       msg += `🔔 *Belum Diverifikasi (${pendingItems.length}):*\n`;
       pendingItems.forEach(item => {
         msg += `• \`${item.no_registrasi}\` - ${item.instansi} (${item.judul})\n`;
+        keyboard.push([{
+          text: `❌ Stop Pengingat ${item.no_registrasi}`,
+          callback_data: `stop_${item.no_registrasi}`
+        }]);
       });
       msg += `\n`;
     }
 
     if (expiredItems.length > 0) {
-      msg += `⏳ *Sudah Kedaluwarsa (${expiredItems.length}):*\n`;
+      msg += `⏳ *Sudah Kedaluwarsa Hari Ini (${expiredItems.length}):*\n`;
       expiredItems.forEach(item => {
         msg += `• \`${item.no_registrasi}\` - ${item.instansi} (${item.judul})\n`;
+        keyboard.push([{
+          text: `❌ Stop Pengingat ${item.no_registrasi}`,
+          callback_data: `stop_${item.no_registrasi}`
+        }]);
       });
       msg += `\n`;
     }
 
-    msg += `_Ketik \`/stop [ID_Registrasi]\` untuk mematikan pengingat per berkas (misal: \`/stop ${pendingItems[0]?.no_registrasi || expiredItems[0]?.no_registrasi || 'TRON-XXXX'}\`)_`;
+    msg += `_Tekan tombol di bawah untuk menonaktifkan pengingat berkala per berkas secara instan._`;
+    const replyMarkup = keyboard.length > 0 ? { inline_keyboard: keyboard } : null;
 
-    sendTelegram(msg);
+    sendTelegram(msg, replyMarkup);
   } catch (err) {
     console.error("Cron Error: " + err.toString());
   }
