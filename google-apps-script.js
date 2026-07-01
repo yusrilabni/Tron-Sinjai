@@ -861,40 +861,75 @@ function handleTelegramWebhook(data) {
     } else if (text.startsWith('/list')) {
       try {
         const submissions = getAllSubmissionData();
-        const activeItems = submissions.filter(sub => sub.status === 'TAYANG');
+        const activeSubmissions = submissions.filter(sub => sub.status === 'TAYANG');
         
-        if (activeItems.length === 0) {
+        if (activeSubmissions.length === 0) {
           sendTelegram(`🖥️ *Materi Tayang Saat Ini*\n\nTidak ada materi yang sedang ditayangkan.`);
           return response({ success: true });
         }
 
-        let msg = `🖥️ *Daftar Materi Tayang Saat Ini*\n\n`;
-        let countMandiri = 0;
-        let countAlbum = 0;
-
-        activeItems.forEach((sub, idx) => {
-          const isAlbum = sub.url && sub.url.includes('|');
-          let label = '';
-          if (isAlbum) {
-            const photoCount = sub.url.split('|').length;
-            label = `📂 [ALBUM - ${photoCount} Foto]`;
-            countAlbum++;
-          } else {
-            label = `📄 [MANDIRI]`;
-            countMandiri++;
-          }
-
-          msg += `${idx + 1}. ${label} \`${sub.no_registrasi}\`\n`;
-          msg += `   • *Instansi:* ${sub.instansi}\n`;
-          msg += `   • *Judul:* ${sub.judul}\n`;
-          msg += `   • *Sisa Hari:* ${sub.sisa_hari} hari\n\n`;
+        const groups = getAllGroups().filter(g => g.status === 'ACTIVE');
+        
+        // Buat map pencarian item grup
+        const itemToGroupMap = {};
+        groups.forEach(g => {
+          g.item_ids.forEach(itemId => {
+            itemToGroupMap[itemId] = g;
+          });
         });
+
+        // Pisahkan individu vs grup
+        const individualItems = [];
+        const groupItemsMap = {}; // group_id -> array of items
+
+        activeSubmissions.forEach(sub => {
+          const group = itemToGroupMap[sub.no_registrasi];
+          if (group) {
+            if (!groupItemsMap[group.id]) {
+              groupItemsMap[group.id] = {
+                group: group,
+                items: []
+              };
+            }
+            groupItemsMap[group.id].items.push(sub);
+          } else {
+            individualItems.push(sub);
+          }
+        });
+
+        let msg = `🖥️ *Daftar Materi Tayang Saat Ini*\n\n`;
+
+        // Tampilkan individu
+        if (individualItems.length > 0) {
+          individualItems.forEach((sub, idx) => {
+            msg += `${idx + 1}. \`${sub.no_registrasi}\`\n`;
+            msg += `   • *Instansi:* ${sub.instansi}\n`;
+            msg += `   • *Judul:* ${sub.judul}\n`;
+            msg += `   • *PIC:* ${sub.pic} (${sub.hp})\n`;
+            msg += `   • *Sisa Hari:* ${sub.sisa_hari} hari\n\n`;
+          });
+        }
+
+        // Tampilkan grup
+        let activeGroupCount = 0;
+        for (const groupId in groupItemsMap) {
+          const gInfo = groupItemsMap[groupId];
+          activeGroupCount++;
+          msg += `👥 *GRUP ${gInfo.group.nama.toUpperCase()} : ${gInfo.group.id}*\n`;
+          gInfo.items.forEach((sub, sIdx) => {
+            msg += `${sIdx + 1}. \`${sub.no_registrasi}\`\n`;
+            msg += `   • *Instansi:* ${sub.instansi}\n`;
+            msg += `   • *Judul:* ${sub.judul}\n`;
+            msg += `   • *PIC:* ${sub.pic} (${sub.hp})\n`;
+            msg += `   • *Sisa Hari:* ${sub.sisa_hari} hari\n`;
+          });
+          msg += `\n`;
+        }
 
         msg += `--------------------------------------\n`;
         msg += `📊 *Statistik Penayangan:*\n`;
-        msg += `• Mandiri: ${countMandiri} konten\n`;
-        msg += `• Album/Folder: ${countAlbum} konten\n`;
-        msg += `• *Total Tayang:* ${activeItems.length} konten`;
+        msg += `• *Total Konten:* ${activeSubmissions.length} konten\n`;
+        msg += `• *Total Grup:* ${activeGroupCount} grup`;
 
         sendTelegram(msg);
       } catch (listErr) {
@@ -1055,7 +1090,7 @@ function getOrCreateGroupsSheet() {
   return sheet;
 }
 
-function handleGetGroups() {
+function getAllGroups() {
   const sheet = getOrCreateGroupsSheet();
   const data = sheet.getDataRange().getValues();
   const result = [];
@@ -1068,7 +1103,15 @@ function handleGetGroups() {
       status: data[i][4] || 'ACTIVE'
     });
   }
-  return response({ success: true, data: result });
+  return result;
+}
+
+function handleGetGroups() {
+  try {
+    return response({ success: true, data: getAllGroups() });
+  } catch(e) {
+    return response({ success: false, message: 'Error: ' + e.toString() });
+  }
 }
 
 function handleCreateGroup(payload, adminUser) {
