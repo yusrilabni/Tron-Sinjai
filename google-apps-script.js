@@ -77,7 +77,12 @@ function doPost(e) {
     
     // Deteksi Webhook Telegram
     if (data.update_id && (data.message || data.callback_query)) {
-      return handleTelegramWebhook(data);
+      try {
+        handleTelegramWebhook(data);
+      } catch (webhookErr) {
+        console.error("Telegram Webhook Error: " + webhookErr.toString());
+      }
+      return HtmlService.createHtmlOutput("ok");
     }
 
     const action = data.action;
@@ -915,7 +920,7 @@ function handleTelegramWebhook(data) {
   } catch (err) {
     console.error("Webhook Error: " + err.toString());
   }
-  return response({ success: true });
+  return HtmlService.createHtmlOutput("ok");
 }
 
 function cronTwoHoursCheck() {
