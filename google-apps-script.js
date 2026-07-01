@@ -798,6 +798,27 @@ function checkExpiredToday(sub, today, timezone) {
   }
 }
 
+function getRentangText(sub, timezone) {
+  try {
+    if (!sub.tanggal_mulai) return '';
+    const parsedStart = safeParseDate(sub.tanggal_mulai);
+    if (!parsedStart) return '';
+    let multiplier = 1;
+    if (sub.satuan === 'MINGGU') multiplier = 7;
+    if (sub.satuan === 'BULAN') multiplier = 30;
+    if (sub.satuan === 'TAHUN') multiplier = 365;
+    const durasi = parseInt(sub.durasi) || 0;
+    
+    const startStr = Utilities.formatDate(parsedStart, timezone, "dd-MM-yyyy");
+    const end = new Date(parsedStart.getTime() + (durasi * multiplier * 24 * 60 * 60 * 1000));
+    const endStr = Utilities.formatDate(end, timezone, "dd-MM-yyyy");
+    
+    return `   • *Rentang:* ${startStr} s/d ${endStr}\n   • *Ditetapkan Expire:* ${endStr}\n`;
+  } catch(e) {
+    return '';
+  }
+}
+
 function getSettingValue(key) {
   try {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -1020,10 +1041,12 @@ function handleTelegramWebhook(data) {
             const isNew = checkIsNew(sub, todayStr, tz);
             const newLabel = isNew ? ` 🔴 *[KONTEN BARU]*` : ``;
             const materiLink = getMateriLink(sub.url);
+            const rentangText = getRentangText(sub, tz);
             msg += `${idx + 1}. \`${sub.no_registrasi}\`${materiLink}${newLabel}\n`;
             msg += `   • *Instansi:* ${sub.instansi}\n`;
             msg += `   • *Judul:* ${sub.judul}\n`;
             msg += `   • *PIC:* ${sub.pic} (${sub.hp})\n`;
+            msg += rentangText;
             msg += `   • *Sisa Hari:* ${sub.sisa_hari} hari\n\n`;
           });
         }
@@ -1038,10 +1061,12 @@ function handleTelegramWebhook(data) {
             const isNew = checkIsNew(sub, todayStr, tz);
             const newLabel = isNew ? ` 🔴 *[KONTEN BARU]*` : ``;
             const materiLink = getMateriLink(sub.url);
+            const rentangText = getRentangText(sub, tz);
             msg += `${sIdx + 1}. \`${sub.no_registrasi}\`${materiLink}${newLabel}\n`;
             msg += `   • *Instansi:* ${sub.instansi}\n`;
             msg += `   • *Judul:* ${sub.judul}\n`;
             msg += `   • *PIC:* ${sub.pic} (${sub.hp})\n`;
+            msg += rentangText;
             msg += `   • *Sisa Hari:* ${sub.sisa_hari} hari\n`;
           });
           msg += `\n`;
@@ -1057,10 +1082,13 @@ function handleTelegramWebhook(data) {
           msg += `\n🔴 *Antrean Konten Baru (Belum Verifikasi) [${pendingSubmissions.length}]:*\n`;
           pendingSubmissions.forEach((sub, pIdx) => {
             const materiLink = getMateriLink(sub.url);
+            const rentangText = getRentangText(sub, tz);
             msg += `${pIdx + 1}. \`${sub.no_registrasi}\`${materiLink}\n`;
             msg += `   • *Instansi:* ${sub.instansi}\n`;
             msg += `   • *Judul:* ${sub.judul}\n`;
-            msg += `   • *PIC:* ${sub.pic} (${sub.hp})\n\n`;
+            msg += `   • *PIC:* ${sub.pic} (${sub.hp})\n`;
+            msg += rentangText;
+            msg += `\n`;
           });
         }
 
@@ -1069,10 +1097,13 @@ function handleTelegramWebhook(data) {
           msg += `\n🔴 *Materi Baru Kedaluwarsa (Expired) [${expiredSubmissions.length}]:*\n`;
           expiredSubmissions.forEach((sub, eIdx) => {
             const materiLink = getMateriLink(sub.url);
+            const rentangText = getRentangText(sub, tz);
             msg += `${eIdx + 1}. \`${sub.no_registrasi}\`${materiLink}\n`;
             msg += `   • *Instansi:* ${sub.instansi}\n`;
             msg += `   • *Judul:* ${sub.judul}\n`;
-            msg += `   • *PIC:* ${sub.pic} (${sub.hp})\n\n`;
+            msg += `   • *PIC:* ${sub.pic} (${sub.hp})\n`;
+            msg += rentangText;
+            msg += `\n`;
           });
         }
 
@@ -1118,50 +1149,37 @@ function cronTwoHoursCheck() {
     const todayStr = Utilities.formatDate(new Date(), tz, "yyyy-MM-dd");
 
     const submissions = getAllSubmissionData();
-    const pendingItems = [];
     const expiredItems = [];
 
     submissions.forEach(sub => {
       // Lewati jika ID ada di daftar stoppedIds
       if (stoppedIds.indexOf(sub.no_registrasi) !== -1) return;
 
-      if (sub.status === 'MENUNGGU_VERIFIKASI') {
-        pendingItems.push(sub);
-      } else if (checkExpiredToday(sub, todayStr, tz)) {
+      if (checkExpiredToday(sub, todayStr, tz)) {
         expiredItems.push(sub);
       }
     });
 
-    if (pendingItems.length === 0 && expiredItems.length === 0) {
+    if (expiredItems.length === 0) {
       return; // Tidak ada yang perlu diingatkan
     }
 
-    let msg = `⏰ *Pengingat Berkala (Setiap 2 Jam)*\n\n`;
+    let msg = `⏰ *Pengingat Berkala Konten Kedaluwarsa (Setiap 2 Jam)*\n\n`;
     const keyboard = [];
 
-    if (pendingItems.length > 0) {
-      msg += `🔔 *Belum Diverifikasi (${pendingItems.length}):*\n`;
-      pendingItems.forEach(item => {
-        msg += `• \`${item.no_registrasi}\` - ${item.instansi} (${item.judul})\n`;
-        keyboard.push([{
-          text: `❌ Stop Pengingat ${item.no_registrasi}`,
-          callback_data: `stop_${item.no_registrasi}`
-        }]);
-      });
-      msg += `\n`;
-    }
-
-    if (expiredItems.length > 0) {
-      msg += `⏳ *Sudah Kedaluwarsa Hari Ini (${expiredItems.length}):*\n`;
-      expiredItems.forEach(item => {
-        msg += `• \`${item.no_registrasi}\` - ${item.instansi} (${item.judul})\n`;
-        keyboard.push([{
-          text: `❌ Stop Pengingat ${item.no_registrasi}`,
-          callback_data: `stop_${item.no_registrasi}`
-        }]);
-      });
-      msg += `\n`;
-    }
+    msg += `⏳ *Sudah Kedaluwarsa Hari Ini (${expiredItems.length}):*\n`;
+    expiredItems.forEach(item => {
+      msg += `• \`${item.no_registrasi}\` - ${item.instansi} (${item.judul})\n`;
+      const rentangText = getRentangText(item, tz);
+      if (rentangText) {
+        msg += rentangText.replace(/   /g, '  ');
+      }
+      keyboard.push([{
+        text: `❌ Stop Pengingat ${item.no_registrasi}`,
+        callback_data: `stop_${item.no_registrasi}`
+      }]);
+    });
+    msg += `\n`;
 
     msg += `_Tekan tombol di bawah untuk menonaktifkan pengingat berkala per berkas secara instan._`;
     const replyMarkup = keyboard.length > 0 ? { inline_keyboard: keyboard } : null;
