@@ -394,6 +394,18 @@ function handleUpdateSubmission(payload) {
     sheet.getRange(target._rowIdx, 18).setValue('NO');
     
     writeLog("SYSTEM", "EDIT_SUBMISSION", `User melakukan perbaikan data pada ID: ${payload.no_registrasi}`);
+
+    try {
+      const msg = `🔄 *Perbaikan Pengajuan*\n\n` +
+                  `*No. Registrasi:* \`${payload.no_registrasi}\`\n` +
+                  `*Instansi:* ${target.instansi || '-'}\n` +
+                  `*Judul Baru:* ${payload.judul}\n` +
+                  `*Kategori Baru:* ${payload.kategori}\n` +
+                  `*Tanggal Mulai Baru:* ${payload.tanggal_mulai}\n\n` +
+                  `Silakan lakukan verifikasi ulang pada Dashboard Admin.`;
+      sendTelegram(msg);
+    } catch (telegramErr) {}
+
     return response({ success: true });
   } catch (err) {
     return response({ success: false, message: "Update Error: " + err.toString() });
@@ -477,6 +489,23 @@ function handlePengajuan(payload) {
     if (payload.status) {
       writeLog("ADMIN", "MANUAL_UPLOAD", `ID: ${noReg} - Judul: ${payload.judul} (${payload.jenis}) -> Status: ${targetStatus}`);
     }
+
+    try {
+      const isPublic = payload.status ? 'Upload Manual Admin' : 'Pendaftaran Publik/OPD';
+      const formatBiaya = (biayaTotal ? biayaTotal.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") : "0");
+      const msg = `🔔 *Pengajuan Baru (${isPublic})*\n\n` +
+                  `*No. Registrasi:* \`${noReg}\`\n` +
+                  `*Instansi:* ${payload.instansi}\n` +
+                  `*PIC:* ${picName} (${hpNumber})\n` +
+                  `*Judul:* ${payload.judul}\n` +
+                  `*Kategori:* ${payload.kategori}\n` +
+                  `*Jenis:* ${payload.jenis}\n` +
+                  `*Durasi:* ${payload.durasi || 0} ${payload.satuan || 'HARI'}\n` +
+                  `*Tanggal Mulai:* ${payload.tanggal_mulai}\n` +
+                  `*Biaya:* Rp ${formatBiaya}\n\n` +
+                  `Silakan lakukan verifikasi pada dashboard admin.`;
+      sendTelegram(msg);
+    } catch (telegramErr) {}
 
     return response({ success: true, no_registrasi: noReg, total_biaya: biayaTotal });
   } catch (err) { return response({ success: false, message: "Submit Error: " + err.toString() }); }
@@ -669,6 +698,10 @@ function generateNoReg() {
 
 function sendTelegram(msg) {
   try {
+    if (!CONFIG.TELEGRAM.TOKEN || CONFIG.TELEGRAM.TOKEN === 'PASTE_TOKEN_BOT_TELEGRAM_DISINI' || 
+        !CONFIG.TELEGRAM.CHAT_ID || CONFIG.TELEGRAM.CHAT_ID === 'PASTE_CHAT_ID_ADMIN_DISINI') {
+      return;
+    }
     const url = `https://api.telegram.org/bot${CONFIG.TELEGRAM.TOKEN}/sendMessage`;
     UrlFetchApp.fetch(url, { method: 'post', contentType: 'application/json', payload: JSON.stringify({ chat_id: CONFIG.TELEGRAM.CHAT_ID, text: msg, parse_mode: 'Markdown' }), muteHttpExceptions: true });
   } catch (e) {}
