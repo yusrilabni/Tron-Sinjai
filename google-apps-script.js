@@ -853,6 +853,48 @@ function handleTelegramWebhook(data) {
     } else if (text.startsWith('/start')) {
       setSettingValue('TELEGRAM_ACTIVE', 'TRUE');
       sendTelegram(`✅ Seluruh notifikasi Telegram telah diaktifkan kembali.`);
+    } else if (text.startsWith('/list')) {
+      try {
+        const submissions = getAllSubmissionData();
+        const activeItems = submissions.filter(sub => sub.status === 'TAYANG');
+        
+        if (activeItems.length === 0) {
+          sendTelegram(`🖥️ *Materi Tayang Saat Ini*\n\nTidak ada materi yang sedang ditayangkan.`);
+          return response({ success: true });
+        }
+
+        let msg = `🖥️ *Daftar Materi Tayang Saat Ini*\n\n`;
+        let countMandiri = 0;
+        let countAlbum = 0;
+
+        activeItems.forEach((sub, idx) => {
+          const isAlbum = sub.url && sub.url.includes('|');
+          let label = '';
+          if (isAlbum) {
+            const photoCount = sub.url.split('|').length;
+            label = `📂 [ALBUM - ${photoCount} Foto]`;
+            countAlbum++;
+          } else {
+            label = `📄 [MANDIRI]`;
+            countMandiri++;
+          }
+
+          msg += `${idx + 1}. ${label} \`${sub.no_registrasi}\`\n`;
+          msg += `   • *Instansi:* ${sub.instansi}\n`;
+          msg += `   • *Judul:* ${sub.judul}\n`;
+          msg += `   • *Sisa Hari:* ${sub.sisa_hari} hari\n\n`;
+        });
+
+        msg += `--------------------------------------\n`;
+        msg += `📊 *Statistik Penayangan:*\n`;
+        msg += `• Mandiri: ${countMandiri} konten\n`;
+        msg += `• Album/Folder: ${countAlbum} konten\n`;
+        msg += `• *Total Tayang:* ${activeItems.length} konten`;
+
+        sendTelegram(msg);
+      } catch (listErr) {
+        sendTelegram(`❌ Gagal mengambil daftar materi: ${listErr.toString()}`);
+      }
     }
   } catch (err) {
     console.error("Webhook Error: " + err.toString());
