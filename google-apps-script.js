@@ -57,6 +57,7 @@ function setupSheets() {
     settingsSheet.appendRow(['PRICE_PER_DAY', '50000', 'Biaya penayangan per hari (Rupiah)']);
   }
   
+  setupTelegramTrigger();
   SpreadsheetApp.getUi().alert('✅ Setup Database Berhasil!');
 }
 
@@ -64,7 +65,21 @@ function setupSheets() {
 
 function doPost(e) {
   try {
-    const data = JSON.parse(e.postData.contents);
+    if (!e || !e.postData || !e.postData.contents) {
+      return response({ success: false, message: "No post data received" });
+    }
+    let data;
+    try {
+      data = JSON.parse(e.postData.contents);
+    } catch (parseErr) {
+      return response({ success: false, message: "Invalid JSON payload" });
+    }
+    
+    // Deteksi Webhook Telegram
+    if (data.update_id && (data.message || data.callback_query)) {
+      return handleTelegramWebhook(data);
+    }
+
     const action = data.action;
     
     // Validasi token untuk aksi admin
@@ -224,6 +239,15 @@ function getAllSubmissionData() {
             if (status === 'DISETUJUI' && today.getTime() >= start.getTime()) {
                sheet.getRange(i + 1, 11).setValue('TAYANG');
                status = 'TAYANG';
+               try {
+                 const msg = `🚀 *Mulai Ditayangkan (Otomatis)*\n\n` +
+                             `*No. Registrasi:* \`${data[i][0]}\`\n` +
+                             `*Instansi:* ${data[i][3]}\n` +
+                             `*Judul:* ${data[i][7]}\n` +
+                             `*Status:* \`TAYANG\`\n\n` +
+                             `Materi videotron telah aktif dan ditayangkan hari ini.`;
+                 sendTelegram(msg);
+               } catch (tgErr) {}
             }
             
             // Tanggal Selesai = Tanggal Mulai + Total Hari Durasi
@@ -248,6 +272,15 @@ function getAllSubmissionData() {
               if (status !== 'EXPIRED') {
                  sheet.getRange(i + 1, 11).setValue('EXPIRED');
                  status = 'EXPIRED';
+                 try {
+                   const msg = `⏳ *Masa Tayang Habis (Otomatis)*\n\n` +
+                               `*No. Registrasi:* \`${data[i][0]}\`\n` +
+                               `*Instansi:* ${data[i][3]}\n` +
+                               `*Judul:* ${data[i][7]}\n` +
+                               `*Status:* \`EXPIRED\`\n\n` +
+                               `Masa penayangan materi videotron telah berakhir.`;
+                   sendTelegram(msg);
+                 } catch (tgErr) {}
               }
               // Sembunyikan hanya jika sudah lewat 24 jam dari kadaluarsa (sisaHari < 0)
               if (sisaHari < 0) shouldHideFromPublic = true;
@@ -356,7 +389,23 @@ function handleUpdateStatus(payload, adminUser) {
       sheet.getRange(target._rowIdx, 17).setValue(docUrl);
     }
     
+    const oldStatus = target.status;
+    const newStatus = payload.status;
+    
     writeLog(adminUser, "UPDATE_STATUS", `ID: ${payload.no_registrasi} -> ${payload.status} (AllowEdit: ${payload.allow_edit})`);
+
+    // Kirim notifikasi Telegram jika status berubah
+    try {
+      const catatanText = payload.catatan ? `\n*Catatan:* ${payload.catatan}` : '';
+      const msg = `✍️ *Pembaruan Status oleh Admin*\n\n` +
+                  `*No. Registrasi:* \`${payload.no_registrasi}\`\n` +
+                  `*Instansi:* ${target.instansi || '-'}\n` +
+                  `*Judul:* ${target.judul}\n` +
+                  `*Status:* \`${oldStatus}\` ➡️ \`${newStatus}\`${catatanText}\n\n` +
+                  `Oleh Admin: ${adminUser}`;
+      sendTelegram(msg);
+    } catch (telegramErr) {}
+
     return response({ success: true });
   }
   return response({ success: false, message: 'Data tidak ditemukan' });
@@ -702,9 +751,185 @@ function sendTelegram(msg) {
         !CONFIG.TELEGRAM.CHAT_ID || CONFIG.TELEGRAM.CHAT_ID === 'PASTE_CHAT_ID_ADMIN_DISINI') {
       return;
     }
+    
+    // Periksa status aktif Telegram
+    const active = getSettingValue('TELEGRAM_ACTIVE');
+    if (active === 'FALSE') {
+      // Pastikan pesan tidak diblokir jika itu adalah pesan aktivasi kembali
+      if (!msg.includes('diaktifkan kembali')) {
+        return;
+      }
+    }
+
     const url = `https://api.telegram.org/bot${CONFIG.TELEGRAM.TOKEN}/sendMessage`;
     UrlFetchApp.fetch(url, { method: 'post', contentType: 'application/json', payload: JSON.stringify({ chat_id: CONFIG.TELEGRAM.CHAT_ID, text: msg, parse_mode: 'Markdown' }), muteHttpExceptions: true });
   } catch (e) {}
+}
+
+function getSettingValue(key) {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sheet = ss.getSheetByName('Settings');
+    if (!sheet) return 'TRUE';
+    const data = sheet.getDataRange().getValues();
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][0] === key) {
+        return data[i][1].toString();
+      }
+    }
+  } catch (e) {}
+  return 'TRUE'; // Default jika belum diatur
+}
+
+function setSettingValue(key, value) {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    let sheet = ss.getSheetByName('Settings');
+    if (!sheet) {
+      sheet = ss.insertSheet('Settings');
+      sheet.appendRow(["Key", "Value", "Description"]);
+    }
+    const data = sheet.getDataRange().getValues();
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][0] === key) {
+        sheet.getRange(i + 1, 2).setValue(value);
+        return;
+      }
+    }
+    sheet.appendRow([key, value, 'Diatur otomatis oleh sistem']);
+  } catch (e) {}
+}
+
+function handleTelegramWebhook(data) {
+  try {
+    if (!data.message || !data.message.text) return response({ success: true });
+    const text = data.message.text.trim();
+    const chat_id = data.message.chat.id.toString();
+
+    // Pastikan chat_id berasal dari grup admin yang dikonfigurasi
+    if (chat_id !== CONFIG.TELEGRAM.CHAT_ID) {
+      return response({ success: true });
+    }
+
+    if (text.startsWith('/stop')) {
+      const parts = text.split(/\s+/);
+      if (parts.length > 1) {
+        const noReg = parts[1].toUpperCase().trim();
+        // Hentikan notifikasi per ID
+        const ss = SpreadsheetApp.getActiveSpreadsheet();
+        let settingsSheet = ss.getSheetByName('Settings');
+        if (!settingsSheet) {
+          settingsSheet = ss.insertSheet('Settings');
+          settingsSheet.appendRow(["Key", "Value", "Description"]);
+        }
+        let stoppedList = [];
+        let stoppedRowIdx = -1;
+        const settingsData = settingsSheet.getDataRange().getValues();
+        for (let i = 1; i < settingsData.length; i++) {
+          if (settingsData[i][0] === 'TELEGRAM_STOPPED_IDS') {
+            try {
+              stoppedList = JSON.parse(settingsData[i][1] || '[]');
+            } catch(e) {
+              stoppedList = [];
+            }
+            stoppedRowIdx = i + 1;
+            break;
+          }
+        }
+        if (stoppedRowIdx === -1) {
+          settingsSheet.appendRow(['TELEGRAM_STOPPED_IDS', JSON.stringify([noReg]), 'Daftar ID Pengajuan yang dihentikan notifikasinya']);
+        } else {
+          if (stoppedList.indexOf(noReg) === -1) {
+            stoppedList.push(noReg);
+          }
+          settingsSheet.getRange(stoppedRowIdx, 2).setValue(JSON.stringify(stoppedList));
+        }
+        sendTelegram(`✅ Notifikasi pengingat untuk ID \`${noReg}\` telah dinonaktifkan.`);
+      } else {
+        // Hentikan semua notifikasi
+        setSettingValue('TELEGRAM_ACTIVE', 'FALSE');
+        sendTelegram(`❌ Seluruh notifikasi Telegram telah dinonaktifkan. Kirim \`/start\` untuk mengaktifkan kembali.`);
+      }
+    } else if (text.startsWith('/start')) {
+      setSettingValue('TELEGRAM_ACTIVE', 'TRUE');
+      sendTelegram(`✅ Seluruh notifikasi Telegram telah diaktifkan kembali.`);
+    }
+  } catch (err) {
+    console.error("Webhook Error: " + err.toString());
+  }
+  return response({ success: true });
+}
+
+function cronTwoHoursCheck() {
+  try {
+    // Cek apakah Telegram aktif
+    if (getSettingValue('TELEGRAM_ACTIVE') === 'FALSE') return;
+
+    // Dapatkan daftar ID yang dinonaktifkan remindernya
+    let stoppedIds = [];
+    try {
+      stoppedIds = JSON.parse(getSettingValue('TELEGRAM_STOPPED_IDS') || '[]');
+    } catch(e) {}
+
+    const submissions = getAllSubmissionData();
+    const pendingItems = [];
+    const expiredItems = [];
+
+    submissions.forEach(sub => {
+      // Lewati jika ID ada di daftar stoppedIds
+      if (stoppedIds.indexOf(sub.no_registrasi) !== -1) return;
+
+      if (sub.status === 'MENUNGGU_VERIFIKASI') {
+        pendingItems.push(sub);
+      } else if (sub.status === 'EXPIRED') {
+        expiredItems.push(sub);
+      }
+    });
+
+    if (pendingItems.length === 0 && expiredItems.length === 0) {
+      return; // Tidak ada yang perlu diingatkan
+    }
+
+    let msg = `⏰ *Pengingat Berkala (Setiap 2 Jam)*\n\n`;
+
+    if (pendingItems.length > 0) {
+      msg += `🔔 *Belum Diverifikasi (${pendingItems.length}):*\n`;
+      pendingItems.forEach(item => {
+        msg += `• \`${item.no_registrasi}\` - ${item.instansi} (${item.judul})\n`;
+      });
+      msg += `\n`;
+    }
+
+    if (expiredItems.length > 0) {
+      msg += `⏳ *Sudah Kedaluwarsa (${expiredItems.length}):*\n`;
+      expiredItems.forEach(item => {
+        msg += `• \`${item.no_registrasi}\` - ${item.instansi} (${item.judul})\n`;
+      });
+      msg += `\n`;
+    }
+
+    msg += `_Ketik \`/stop [ID_Registrasi]\` untuk mematikan pengingat per berkas (misal: \`/stop ${pendingItems[0]?.no_registrasi || expiredItems[0]?.no_registrasi || 'TRON-XXXX'}\`)_`;
+
+    sendTelegram(msg);
+  } catch (err) {
+    console.error("Cron Error: " + err.toString());
+  }
+}
+
+function setupTelegramTrigger() {
+  try {
+    const triggerName = 'cronTwoHoursCheck';
+    const triggers = ScriptApp.getProjectTriggers();
+    for (let i = 0; i < triggers.length; i++) {
+      if (triggers[i].getHandlerFunction() === triggerName) {
+        return; // Sudah ada
+      }
+    }
+    ScriptApp.newTrigger(triggerName)
+      .timeBased()
+      .everyHours(2)
+      .create();
+  } catch(e) {}
 }
 
 function handleDeleteGalleryItem(id, adminUser) {
