@@ -8,7 +8,7 @@ const CONFIG = {
   SPREADSHEET_ID: SpreadsheetApp.getActiveSpreadsheet().getId(),
   DRIVE_FOLDER_ID: '15oLjsSDkY4NtGCzKwyVlLSkRGZ7UCh2F', 
   TELEGRAM: {
-    TOKEN: 'PASTE_TOKEN_BOT_TELEGRAM_DISINI',
+    TOKEN: '8850012352:AAEffY8j5brh3gZjAgoLpTxdRObITnLKPs0',
     CHAT_ID: 'PASTE_CHAT_ID_ADMIN_DISINI'
   }
 };
